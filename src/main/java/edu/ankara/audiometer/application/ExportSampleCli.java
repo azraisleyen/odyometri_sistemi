@@ -1,0 +1,3 @@
+package edu.ankara.audiometer.application;
+import edu.ankara.audiometer.domain.config.AudiometryConfig;import edu.ankara.audiometer.infrastructure.serial.FakeSerialGateway;import java.nio.file.Path;
+public final class ExportSampleCli { public static void main(String[] args){ var uc=new AudiometryUseCase(AudiometryConfig.defaults(),new FakeSerialGateway()); uc.sessions().presentTone(); uc.sessions().response(); uc.exports().exportCsv(uc.sessions().state(), Path.of("exports/sample.csv")); uc.exports().exportJson(uc.sessions().state(), Path.of("exports/sample.json")); System.out.println("Sample exports written to exports/"); } }

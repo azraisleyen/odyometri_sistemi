@@ -1,0 +1,59 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+group = 'edu.ankara'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+application {
+    mainClass = 'edu.ankara.audiometer.Main'
+}
+
+javafx {
+    version = '21.0.5'
+    modules = [
+        'javafx.controls',
+        'javafx.fxml',
+        'javafx.graphics',
+        'javafx.base'
+    ]
+}
+
+dependencies {
+    implementation 'com.fazecast:jSerialComm:2.11.0'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation 'net.jqwik:jqwik:1.8.5'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.register('runSimulation', JavaExec) {
+    group = 'application'
+    description = 'Launches the JavaFX audiometer GUI in simulation mode.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'edu.ankara.audiometer.Main'
+    args '--simulation'
+}
+
+tasks.register('exportSample', JavaExec) {
+    group = 'application'
+    description = 'Writes sample audiogram CSV/JSON exports under exports/.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'edu.ankara.audiometer.application.ExportSampleCli'
+}

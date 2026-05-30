@@ -1,0 +1,3 @@
+package edu.ankara.audiometer.infrastructure.export;
+import edu.ankara.audiometer.domain.model.*;import java.util.stream.*;
+public final class CsvAudiogramExporter { public String export(TestState s){ String header="session_id,ear,frequency_hz,threshold_db_hl,criterion,presentation_count,completed_at_order,notes\n"; return header+s.audiogram().points().stream().map(p->String.join(",",s.session().sessionId(),p.ear().name(),String.valueOf(p.frequency().value()),String.valueOf(p.thresholdDbHL().value()),p.criterion().name(),String.valueOf(p.presentationCount()),String.valueOf(p.completedAtOrder()),quote(p.notes()))).collect(Collectors.joining("\n")); } private static String quote(String s){return '"'+s.replace("\"","\"\"")+'"';} }

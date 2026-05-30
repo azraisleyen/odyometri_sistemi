@@ -1,0 +1,3 @@
+package edu.ankara.audiometer.domain.fp;
+import java.util.function.*;
+public sealed interface Result<T,E> permits Result.Ok, Result.Err { boolean isOk(); T orElse(T other); <U> Result<U,E> map(Function<T,U> f); static <T,E> Result<T,E> ok(T v){return new Ok<>(v);} static <T,E> Result<T,E> err(E e){return new Err<>(e);} record Ok<T,E>(T value) implements Result<T,E>{ public boolean isOk(){return true;} public T orElse(T other){return value;} public <U> Result<U,E> map(Function<T,U> f){return ok(f.apply(value));} } record Err<T,E>(E error) implements Result<T,E>{ public boolean isOk(){return false;} public T orElse(T other){return other;} public <U> Result<U,E> map(Function<T,U> f){return err(error);} } }

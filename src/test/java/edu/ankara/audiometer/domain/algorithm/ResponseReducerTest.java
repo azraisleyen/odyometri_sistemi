@@ -1,0 +1,3 @@
+package edu.ankara.audiometer.domain.algorithm;
+import edu.ankara.audiometer.domain.config.*;import edu.ankara.audiometer.domain.model.*;import org.junit.jupiter.api.Test;import java.util.*;import static org.junit.jupiter.api.Assertions.*;
+class ResponseReducerTest { @Test void reduceResponsesIsDeterministic(){ var s=TestState.initial(AudiometryConfig.defaults()); var r=List.of(PatientResponse.HEARD,PatientResponse.NOT_HEARD,PatientResponse.HEARD); assertEquals(ResponseReducer.reduceResponses(s,r),ResponseReducer.reduceResponses(s,r)); } @Test void stateIsImmutable(){ var s=TestState.initial(AudiometryConfig.defaults()); var n=ResponseReducer.reduceResponses(s,List.of(PatientResponse.HEARD)); assertNotSame(s,n); assertEquals(0,s.presentations().size()); } }
