@@ -1,0 +1,1 @@
+package javafx.scene.layout; import javafx.scene.Parent; import javafx.geometry.Insets; public class VBox extends Parent { public VBox(double spacing, Parent... children){} public VBox(Parent... children){} public void setPadding(Insets i){} public void setPrefWidth(double w){} }

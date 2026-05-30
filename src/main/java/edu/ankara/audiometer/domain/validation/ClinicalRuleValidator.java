@@ -1,0 +1,3 @@
+package edu.ankara.audiometer.domain.validation;
+import edu.ankara.audiometer.domain.config.AudiometryConfig;import edu.ankara.audiometer.domain.model.ValidationResult;import java.util.*;
+public final class ClinicalRuleValidator { private ClinicalRuleValidator(){} public static ValidationResult validateAlgorithmConfig(AudiometryConfig c){ List<String> e=new ArrayList<>(); if(c.algorithm().heardDecreaseDb()!=10)e.add("Heard response must decrease by 10 dB by default"); if(c.algorithm().notHeardIncreaseDb()!=5)e.add("No response must increase by 5 dB by default"); if(c.minFrequency().value()!=250||c.maxFrequency().value()!=8000)e.add("Course frequency range must be 250-8000 Hz"); return e.isEmpty()?ValidationResult.ok():new ValidationResult(false,e); } }

@@ -1,0 +1,10 @@
+.app { -fx-font-family: "Inter", "Segoe UI", sans-serif; -fx-background-color: #f4f7fb; }
+.title { -fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #123047; }
+.subtitle { -fx-font-size: 14px; -fx-text-fill: #52677a; }
+.mode { -fx-background-color: #dff3ff; -fx-padding: 4 10; -fx-background-radius: 12; -fx-text-fill: #075985; }
+.titled-pane > .title { -fx-background-color: #e8eef7; }
+.button { -fx-background-radius: 7; -fx-padding: 7 11; }
+.response { -fx-background-color: #16a34a; -fx-text-fill: white; -fx-font-weight: bold; }
+.state { -fx-font-family: "Consolas"; -fx-font-size: 13px; }
+.default-color0.chart-line-symbol { -fx-background-color: #dc2626, white; -fx-background-radius: 10px; -fx-padding: 6px; }
+.default-color1.chart-line-symbol { -fx-background-color: #2563eb, white; -fx-background-radius: 0; -fx-padding: 6px; }

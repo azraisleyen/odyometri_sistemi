@@ -1,0 +1,11 @@
+package edu.ankara.audiometer.domain.algorithm;
+import edu.ankara.audiometer.domain.config.*;import edu.ankara.audiometer.domain.model.*;import edu.ankara.audiometer.domain.validation.AudiometryValidators;import edu.ankara.audiometer.domain.fp.Validation;import java.util.*;
+public final class AudiometryFunctions { private AudiometryFunctions(){}
+ public static Validation<FrequencyHz> validateFrequency(FrequencyHz f,AudiometryConfig c){return AudiometryValidators.validateFrequency(f,c);} public static Validation<IntensityDbHL> validateIntensity(IntensityDbHL i,AudiometryConfig c){return AudiometryValidators.validateIntensity(i,c);} 
+ public static IntensityDbHL nextIntensityAfterResponse(IntensityDbHL current, PatientResponse r, HughsonWestlakeConfig hw, AudiometryConfig c){ int step=r.heard()?-hw.heardDecreaseDb():hw.notHeardIncreaseDb(); return current.plus(step,c.minIntensity().value(),c.maxIntensity().value()); }
+ public static Optional<FrequencyHz> nextFrequency(FrequencyHz current, FrequencyPlan plan){ var o=plan.activeOrder(); for(int i=0;i<o.size()-1;i++) if(o.get(i).equals(current)) return Optional.of(o.get(i+1)); return Optional.empty(); }
+ public static Optional<Ear> nextEar(Ear current, TestState s){ var ears=s.config().ears(); int idx=ears.indexOf(current); return idx>=0&&idx<ears.size()-1?Optional.of(ears.get(idx+1)):Optional.empty(); }
+ public static TonePresentation createTonePresentation(TestState s){ boolean asc=s.direction()==PresentationDirection.ASCENDING || s.phase()==TestPhase.ASCENDING_SEARCH; return new TonePresentation(s.currentEar(),s.currentFrequency(),s.currentIntensity(),s.nextOrder(),Optional.empty(),s.direction(),asc); }
+ public static AudiogramPoint createAudiogramPoint(TestState s, IntensityDbHL threshold){ long count=s.presentations().stream().filter(p->p.ear()==s.currentEar()&&p.frequency().equals(s.currentFrequency())).count(); return new AudiogramPoint(s.currentEar(),s.currentFrequency(),threshold,s.config().algorithm().criterion(),(int)count,s.presentations().size(),classifyHearingLevel(threshold)); }
+ public static String classifyHearingLevel(IntensityDbHL t){ int v=t.value(); if(v<=25)return "Normal/near-normal (educational classification)"; if(v<=40)return "Mild"; if(v<=55)return "Moderate"; if(v<=70)return "Moderately severe"; if(v<=90)return "Severe"; return "Profound"; }
+}

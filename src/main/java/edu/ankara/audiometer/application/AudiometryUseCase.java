@@ -1,0 +1,3 @@
+package edu.ankara.audiometer.application;
+import edu.ankara.audiometer.domain.config.AudiometryConfig;import edu.ankara.audiometer.infrastructure.serial.SerialPortGateway;
+public final class AudiometryUseCase { private final TestSessionService sessions; private final SimulationService simulation=new SimulationService(); private final AudiogramExportService exports=new AudiogramExportService(); public AudiometryUseCase(AudiometryConfig c, SerialPortGateway g){sessions=new TestSessionService(c,g);} public TestSessionService sessions(){return sessions;} public SimulationService simulation(){return simulation;} public AudiogramExportService exports(){return exports;} }

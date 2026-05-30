@@ -1,0 +1,3 @@
+package edu.ankara.audiometer.application;
+import edu.ankara.audiometer.domain.algorithm.TestStateReducer;import edu.ankara.audiometer.domain.config.SerialProtocolConfig;import edu.ankara.audiometer.domain.model.*;import edu.ankara.audiometer.infrastructure.serial.SerialProtocol;import java.util.*;
+public final class SerialMessageProcessor { private final SerialProtocolConfig config; public SerialMessageProcessor(SerialProtocolConfig config){this.config=config;} public TestState process(TestState initial,List<String> rawMessages){ return rawMessages.stream().map(SerialProtocol::sanitizeSerialInput).filter(s->!s.isBlank()).map(s->SerialProtocol.parseResponseMessage(s,config)).flatMap(Optional::stream).reduce(initial, TestStateReducer::updateState, (a,b)->b); } }

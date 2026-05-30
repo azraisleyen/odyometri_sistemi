@@ -1,0 +1,8 @@
+package edu.ankara.audiometer.domain.validation;
+import edu.ankara.audiometer.domain.config.*;import edu.ankara.audiometer.domain.fp.Validation;import edu.ankara.audiometer.domain.model.*;import java.util.*;
+public final class AudiometryValidators { private AudiometryValidators(){}
+ public static Validation<FrequencyHz> validateFrequency(FrequencyHz f, AudiometryConfig c){ if(f.value()<c.minFrequency().value()||f.value()>c.maxFrequency().value()) return Validation.invalid("Frequency outside configured 250-8000 Hz range: "+f.value()); if(!c.manualFrequencyOverride() && c.frequencyPlan().requiredFrequencies().stream().noneMatch(x->x.equals(f)) && c.frequencyPlan().optionalInterOctaves().stream().noneMatch(x->x.equals(f))) return Validation.invalid("Frequency not in configured plan: "+f.value()); return Validation.ok(f); }
+ public static Validation<IntensityDbHL> validateIntensity(IntensityDbHL i,AudiometryConfig c){ if(i.value()<c.minIntensity().value()||i.value()>c.maxIntensity().value()) return Validation.invalid("Intensity outside configured range: "+i.value()); return Validation.ok(i); }
+ public static Validation<TestState> validateSessionCompleteness(TestState s){ var missing=s.config().ears().stream().flatMap(e->s.config().frequencyPlan().requiredFrequencies().stream().map(f->e+":"+f.value()).filter(key->s.audiogram().points().stream().noneMatch(p->(p.ear()+":"+p.frequency().value()).equals(key)))).toList(); return missing.isEmpty()?Validation.ok(s):Validation.invalid("Missing thresholds: "+missing); }
+ public static boolean hasDuplicateThresholds(TestState s){ var set=new HashSet<String>(); return s.audiogram().points().stream().map(p->p.ear()+":"+p.frequency().value()).anyMatch(k->!set.add(k)); }
+}
