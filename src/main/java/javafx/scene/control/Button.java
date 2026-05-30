@@ -1,1 +1,0 @@
-package javafx.scene.control; import javafx.scene.Parent; import java.util.function.Consumer; public class Button extends Parent { public Button(String t){} public void setOnAction(Consumer<Object> c){} }

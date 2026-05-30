@@ -1,1 +1,0 @@
-package javafx.collections; import java.util.*; public final class FXCollections { public static <T> ObservableList<T> observableArrayList(java.util.Collection<T> c){var l=new ObservableList<T>(); l.addAll(c); return l;} }

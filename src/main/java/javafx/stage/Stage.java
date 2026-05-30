@@ -1,1 +1,0 @@
-package javafx.stage; import javafx.scene.Scene; public class Stage { public void setTitle(String t){} public void setScene(Scene s){} public void show(){ System.out.println("JavaFX stub stage shown"); } }

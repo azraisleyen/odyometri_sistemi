@@ -1,1 +1,0 @@
-package javafx.scene.chart; import javafx.scene.Parent; import java.util.*; public class XYChart<X,Y> extends Parent { public static class Data<X,Y>{ public Data(X x,Y y){} } public static class Series<X,Y>{ private String name; private final List<Data<X,Y>> data=new ArrayList<>(); public void setName(String n){name=n;} public List<Data<X,Y>> getData(){return data;} } }

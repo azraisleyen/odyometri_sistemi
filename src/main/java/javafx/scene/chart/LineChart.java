@@ -1,1 +1,0 @@
-package javafx.scene.chart; import java.util.*; public class LineChart<X,Y> extends XYChart<X,Y> { private final List<Series<X,Y>> data=new ArrayList<>(); public LineChart(NumberAxis x, NumberAxis y){} public void setTitle(String t){} public void setLegendVisible(boolean b){} public void setCreateSymbols(boolean b){} public List<Series<X,Y>> getData(){return data;} }

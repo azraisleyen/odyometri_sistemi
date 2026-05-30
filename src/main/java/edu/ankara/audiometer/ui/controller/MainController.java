@@ -18,7 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.SplitPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.VBox;
 
 import java.nio.file.Path;

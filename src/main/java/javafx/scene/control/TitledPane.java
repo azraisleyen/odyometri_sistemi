@@ -1,1 +1,0 @@
-package javafx.scene.control; import javafx.scene.Parent; public class TitledPane extends Parent { public TitledPane(){} public TitledPane(String t, Parent p){setText(t); setContent(p);} public void setText(String t){} public void setCollapsible(boolean b){} public void setContent(Parent p){} }

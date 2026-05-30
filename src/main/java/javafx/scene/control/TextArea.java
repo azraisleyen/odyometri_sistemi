@@ -1,1 +1,0 @@
-package javafx.scene.control; import javafx.scene.Parent; public class TextArea extends Parent { public void setEditable(boolean b){} public void setPrefRowCount(int r){} public void appendText(String s){System.out.print(s);} }

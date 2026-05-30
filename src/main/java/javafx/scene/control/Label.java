@@ -1,1 +1,0 @@
-package javafx.scene.control; import javafx.scene.Parent; public class Label extends Parent { private String text=""; public Label(){} public Label(String t){text=t;} public void setText(String t){text=t;} public String getText(){return text;} }
