@@ -1,5 +1,23 @@
 # Testing Report
 
-`gradle test` runs the repository's unit/property harness. Tests cover validation, response parsing, serial command generation, 10 dB down / 5 dB up rules, threshold criteria, right/left independence, immutable state updates, CSV formatting, parser robustness, deterministic reducers, and transition invariants.
+The project uses real JUnit 5 and real jqwik through Gradle's JUnit Platform support. Run:
 
-These tests provide evidence for the report's Software Tests section and support IEC 60645-1-related algorithmic discipline at an educational simulation level.
+```powershell
+gradle test
+```
+
+The test suite covers:
+
+* Frequency and intensity validation.
+* RESPONSE parsing and invalid message handling.
+* Serial command generation.
+* Heard => -10 dB and no-response => +5 dB rules.
+* 2/3 and 3/5 ascending threshold criteria.
+* Independent right/left ear audiogram results.
+* Audiogram point creation.
+* Immutable state updates.
+* Session completeness validation.
+* CSV row counts and JSON session fields.
+* Property-based parser robustness, intensity bounds, and deterministic reducers.
+
+These automated tests provide evidence for the Software Tests section of the academic report.
