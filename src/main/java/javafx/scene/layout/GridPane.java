@@ -1,0 +1,1 @@
+package javafx.scene.layout; import javafx.scene.Parent; public class GridPane extends Parent { public void setHgap(double d){} public void setVgap(double d){} public void addRow(int r, Parent... p){} }

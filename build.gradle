@@ -1,0 +1,12 @@
+plugins { id 'java'; id 'application' }
+
+group = 'edu.ankara'
+version = '1.0.0'
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+application { mainClass = 'edu.ankara.audiometer.Main' }
+
+tasks.register('runUnitTests', JavaExec) { group='verification'; classpath = sourceSets.test.runtimeClasspath; mainClass = 'edu.ankara.audiometer.TestRunner' }
+test { scanForTestClasses = false; include '**/NoSuchTest.class'; dependsOn tasks.named('runUnitTests') }
+tasks.named('check') { dependsOn tasks.named('runUnitTests') }
+tasks.register('runSimulation', JavaExec) { group='application'; classpath=sourceSets.main.runtimeClasspath; mainClass='edu.ankara.audiometer.Main'; args '--simulation' }
+tasks.register('exportSample', JavaExec) { group='application'; classpath=sourceSets.main.runtimeClasspath; mainClass='edu.ankara.audiometer.application.ExportSampleCli' }

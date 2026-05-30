@@ -1,0 +1,1 @@
+package javafx.beans.property; public class SimpleIntegerProperty extends Number { private final int v; public SimpleIntegerProperty(int v){this.v=v;} public int intValue(){return v;} public long longValue(){return v;} public float floatValue(){return v;} public double doubleValue(){return v;} }

@@ -1,0 +1,1 @@
+package javafx.collections; import java.util.*; public class ObservableList<T> extends ArrayList<T> { @SafeVarargs public final boolean addAll(T... xs){return super.addAll(Arrays.asList(xs));} public void setAll(Collection<? extends T> c){clear(); addAll(c);} }
