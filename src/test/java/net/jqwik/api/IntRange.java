@@ -1,0 +1,1 @@
+package net.jqwik.api; import java.lang.annotation.*; @Retention(RetentionPolicy.RUNTIME) @Target({ElementType.METHOD,ElementType.PARAMETER}) public @interface IntRange { int min() default 0; int max() default 0; }

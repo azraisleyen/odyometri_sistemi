@@ -1,0 +1,1 @@
+package javafx.scene; import java.util.*; public class Scene { private final List<String> sheets=new ArrayList<>(); public Scene(Parent p,double w,double h){} public List<String> getStylesheets(){return sheets;} }
