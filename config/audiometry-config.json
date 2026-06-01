@@ -1,0 +1,14 @@
+{
+  "academicNotice": "Educational audiometry simulation; not a certified clinical medical device.",
+  "frequencyRangeHz": { "min": 250, "max": 8000 },
+  "defaultFrequenciesHz": [250, 500, 1000, 2000, 4000, 8000],
+  "clinicalOrderHz": [1000, 2000, 4000, 8000, 1000, 500, 250],
+  "optionalInterOctavesHz": [750, 1500, 3000, 6000],
+  "startIntensityDbHL": 40,
+  "intensityRangeDbHL": { "min": -10, "max": 120 },
+  "heardDecreaseDb": 10,
+  "notHeardIncreaseDb": 5,
+  "responseTimeoutMs": 2500,
+  "defaultCriterion": "TWO_OUT_OF_THREE_ASCENDING",
+  "serial": { "baudRate": 9600, "commandFormat": "TONE;EAR=<RIGHT|LEFT>;FREQ=<Hz>;DB=<dBHL>;DURATION_MS=<ms>", "incomingResponse": "RESPONSE" }
+}

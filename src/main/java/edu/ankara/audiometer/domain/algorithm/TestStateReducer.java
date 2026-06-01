@@ -1,0 +1,3 @@
+package edu.ankara.audiometer.domain.algorithm;
+import edu.ankara.audiometer.domain.model.*;
+public final class TestStateReducer { private TestStateReducer(){} public static TestState updateState(TestState state, ProtocolEvent event){ TestState s=state.withEvent(event); return switch(event){ case ProtocolEvent.Response r -> HughsonWestlakeEngine.applyResponseToLastPresentation(s, PatientResponse.HEARD); case ProtocolEvent.NoResponse n -> HughsonWestlakeEngine.applyResponseToLastPresentation(s, PatientResponse.NOT_HEARD); case ProtocolEvent.ErrorMessage e -> s.withError(e.message()); default -> s; }; } }
