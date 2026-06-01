@@ -1,3 +1,29 @@
 package edu.ankara.audiometer.infrastructure.export;
-import edu.ankara.audiometer.domain.model.*;import java.util.stream.*;
-public final class CsvAudiogramExporter { public String export(TestState s){ String header="session_id,ear,frequency_hz,threshold_db_hl,criterion,presentation_count,completed_at_order,notes\n"; return header+s.audiogram().points().stream().map(p->String.join(",",s.session().sessionId(),p.ear().name(),String.valueOf(p.frequency().value()),String.valueOf(p.thresholdDbHL().value()),p.criterion().name(),String.valueOf(p.presentationCount()),String.valueOf(p.completedAtOrder()),quote(p.notes()))).collect(Collectors.joining("\n")); } private static String quote(String s){return '"'+s.replace("\"","\"\"")+'"';} }
+
+import edu.ankara.audiometer.domain.model.TestState;
+
+import java.util.stream.Collectors;
+
+public final class CsvAudiogramExporter {
+    private static final String HEADER = "session_id,ear,frequency_hz,threshold_db_hl,criterion,presentation_count,completed_at_order,notes\n";
+
+    public String export(TestState state) {
+        return HEADER + state.audiogram().points().stream()
+                .map(point -> String.join(
+                        ",",
+                        state.session().sessionId(),
+                        point.ear().name(),
+                        String.valueOf(point.frequency().value()),
+                        String.valueOf(point.thresholdDbHL().value()),
+                        point.criterion().name(),
+                        String.valueOf(point.presentationCount()),
+                        String.valueOf(point.completedAtOrder()),
+                        quote(point.notes())
+                ))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private static String quote(String value) {
+        return '"' + value.replace("\"", "\"\"") + '"';
+    }
+}

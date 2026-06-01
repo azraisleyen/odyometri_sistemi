@@ -12,7 +12,7 @@ import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
 
 public final class SerialPanel extends TitledPane {
-    public SerialPanel(SerialPortGateway gateway, boolean simulationMode, Consumer<String> log, Consumer<String> onIncomingLine) {
+    public SerialPanel(SerialPortGateway gateway, boolean simulationMode, int defaultBaudRate, Consumer<String> log, Consumer<String> onIncomingLine) {
         setText("Serial Connection");
         setCollapsible(false);
 
@@ -24,7 +24,7 @@ public final class SerialPanel extends TitledPane {
 
         ComboBox<Integer> baud = new ComboBox<>();
         baud.getItems().addAll(9600, 19200, 115200);
-        baud.setValue(9600);
+        baud.setValue(defaultBaudRate);
 
         Label status = new Label(simulationMode ? "Simulation mode: no COM port required" : "Disconnected");
         CheckBox simulation = new CheckBox("Run without hardware using Simulation Mode");

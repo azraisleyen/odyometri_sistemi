@@ -1,3 +1,60 @@
 package edu.ankara.audiometer.infrastructure.export;
-import edu.ankara.audiometer.domain.model.*;import edu.ankara.audiometer.domain.fp.Result;import java.util.stream.Collectors;
-public final class JsonSessionExporter { public Result<String,String> export(TestState s){ String points=s.audiogram().points().stream().map(p->"{\"ear\":\"%s\",\"frequency_hz\":%d,\"threshold_db_hl\":%d,\"criterion\":\"%s\",\"presentation_count\":%d}".formatted(p.ear(),p.frequency().value(),p.thresholdDbHL().value(),p.criterion(),p.presentationCount())).collect(Collectors.joining(",")); String presentations=s.presentations().stream().map(p->"{\"ear\":\"%s\",\"frequency_hz\":%d,\"db_hl\":%d,\"order\":%d,\"direction\":\"%s\",\"response\":\"%s\"}".formatted(p.ear(),p.frequency().value(),p.intensity().value(),p.orderIndex(),p.direction(),p.response().map(Enum::name).orElse("PENDING"))).collect(Collectors.joining(",")); return Result.ok("{\n  \"software_version\": \"%s\",\n  \"mode\": \"%s\",\n  \"session_id\": \"%s\",\n  \"configuration\": {\"min_frequency_hz\":%d,\"max_frequency_hz\":%d,\"min_db_hl\":%d,\"max_db_hl\":%d,\"criterion\":\"%s\"},\n  \"thresholds\": [%s],\n  \"presentation_history\": [%s]\n}".formatted(s.session().softwareVersion(),s.session().mode(),s.session().sessionId(),s.config().minFrequency().value(),s.config().maxFrequency().value(),s.config().minIntensity().value(),s.config().maxIntensity().value(),s.config().algorithm().criterion(),points,presentations)); } }
+
+import edu.ankara.audiometer.domain.fp.Result;
+import edu.ankara.audiometer.domain.model.TestState;
+import edu.ankara.audiometer.infrastructure.json.JsonSupport;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public final class JsonSessionExporter {
+    public Result<String, String> export(TestState state) {
+        return Result.ok(JsonSupport.prettyPrint(sessionDocument(state)));
+    }
+
+    private static Map<String, Object> sessionDocument(TestState state) {
+        Map<String, Object> root = new LinkedHashMap<>();
+        root.put("software_version", state.session().softwareVersion());
+        root.put("mode", state.session().mode());
+        root.put("session_id", state.session().sessionId());
+        root.put("configuration", configuration(state));
+        root.put("thresholds", state.audiogram().points().stream().map(point -> {
+            Map<String, Object> threshold = new LinkedHashMap<>();
+            threshold.put("ear", point.ear().name());
+            threshold.put("frequency_hz", point.frequency().value());
+            threshold.put("threshold_db_hl", point.thresholdDbHL().value());
+            threshold.put("criterion", point.criterion().name());
+            threshold.put("presentation_count", point.presentationCount());
+            threshold.put("completed_at_order", point.completedAtOrder());
+            threshold.put("notes", point.notes());
+            return threshold;
+        }).toList());
+        root.put("presentation_history", state.presentations().stream().map(presentation -> {
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("ear", presentation.ear().name());
+            item.put("frequency_hz", presentation.frequency().value());
+            item.put("db_hl", presentation.intensity().value());
+            item.put("order", presentation.orderIndex());
+            item.put("direction", presentation.direction().name());
+            item.put("response", presentation.response().map(Enum::name).orElse("PENDING"));
+            return item;
+        }).toList());
+        return root;
+    }
+
+    private static Map<String, Object> configuration(TestState state) {
+        Map<String, Object> config = new LinkedHashMap<>();
+        config.put("min_frequency_hz", state.config().minFrequency().value());
+        config.put("max_frequency_hz", state.config().maxFrequency().value());
+        config.put("required_frequencies_hz", state.config().frequencyPlan().requiredFrequencies().stream().map(f -> f.value()).toList());
+        config.put("active_order_hz", state.config().frequencyPlan().activeOrder().stream().map(f -> f.value()).toList());
+        config.put("min_db_hl", state.config().minIntensity().value());
+        config.put("max_db_hl", state.config().maxIntensity().value());
+        config.put("start_db_hl", state.config().algorithm().startIntensity().value());
+        config.put("heard_decrease_db", state.config().algorithm().heardDecreaseDb());
+        config.put("not_heard_increase_db", state.config().algorithm().notHeardIncreaseDb());
+        config.put("criterion", state.config().algorithm().criterion().name());
+        config.put("ears", state.config().ears().stream().map(Enum::name).toList());
+        return config;
+    }
+}
