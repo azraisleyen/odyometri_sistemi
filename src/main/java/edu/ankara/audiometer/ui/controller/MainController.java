@@ -2,6 +2,7 @@ package edu.ankara.audiometer.ui.controller;
 
 import edu.ankara.audiometer.application.AudiometryUseCase;
 import edu.ankara.audiometer.domain.fp.Result;
+import edu.ankara.audiometer.domain.model.EarTestMode;
 import edu.ankara.audiometer.domain.model.TestPhase;
 import edu.ankara.audiometer.domain.model.TestState;
 import edu.ankara.audiometer.domain.model.ThresholdCriterion;
@@ -15,10 +16,10 @@ import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.control.SplitPane;
 import javafx.scene.layout.VBox;
 
 import java.nio.file.Path;
@@ -30,6 +31,7 @@ public final class MainController {
 
     private final AudiometryUseCase useCase;
     private final boolean simulationMode;
+    private final String configWarning;
     private final AudiogramChartPane chart = new AudiogramChartPane();
     private final LogPanel log = new LogPanel();
     private final ResultPanel results = new ResultPanel();
@@ -37,9 +39,10 @@ public final class MainController {
     private final Label stateLabel = new Label();
     private int lastThresholdCount = 0;
 
-    public MainController(AudiometryUseCase useCase, boolean simulationMode) {
+    public MainController(AudiometryUseCase useCase, boolean simulationMode, String configWarning) {
         this.useCase = useCase;
         this.simulationMode = simulationMode;
+        this.configWarning = configWarning == null ? "" : configWarning;
         this.mode.setText(simulationMode ? "Simulation Mode" : "Serial Mode");
         this.useCase.sessions().onState(state -> Platform.runLater(() -> refresh(state)));
     }
@@ -52,16 +55,19 @@ public final class MainController {
         var controls = new ControlPanel(
                 this::start,
                 this::pause,
+                this::resume,
                 this::stop,
                 this::present,
                 this::manualResponse,
                 this::autoSimulate,
                 this::reset,
-                this::criterionChanged
+                this::criterionChanged,
+                this::earModeChanged
         );
         var serial = new SerialPanel(
                 useCase.sessions().gateway(),
                 simulationMode,
+                useCase.sessions().state().config().serialProtocol().baudRate(),
                 log::add,
                 line -> Platform.runLater(() -> {
                     log.add("Incoming serial: " + line);
@@ -78,6 +84,11 @@ public final class MainController {
         root.setLeft(left);
         root.setCenter(center);
         refresh(useCase.sessions().state());
+        if (!configWarning.isBlank()) {
+            log.add("Config warning: " + configWarning);
+        } else {
+            log.add("Config loaded from config/audiometry-config.json");
+        }
         return root;
     }
 
@@ -116,7 +127,12 @@ public final class MainController {
 
     private void pause() {
         useCase.sessions().pause();
-        log.add("Session paused");
+        log.add("Session paused; Resume continues the same session");
+    }
+
+    private void resume() {
+        useCase.sessions().resume();
+        log.add("Session resumed");
     }
 
     private void stop() {
@@ -139,18 +155,13 @@ public final class MainController {
     }
 
     private void autoSimulate() {
-        var command = useCase.sessions().presentTone();
-        if (command.isOk()) {
-            log.add("Outgoing serial command: " + command.orElse(""));
-        }
-        var state = useCase.sessions().state();
-        var threshold = useCase.simulation().thresholdFor(state.currentEar(), state.currentFrequency());
-        if (state.currentIntensity().value() >= threshold.value()) {
-            useCase.sessions().response();
-            log.add("Auto simulation: current level >= simulated threshold; RESPONSE applied");
+        var result = useCase.sessions().autoSimulateStep(useCase.simulation());
+        if (result.isOk()) {
+            var step = result.orElse(null);
+            log.add("Outgoing serial command: " + step.command());
+            log.add("Auto simulation: " + step.responseEvent() + " applied (simulated threshold " + step.simulatedThresholdDbHL() + " dB HL)");
         } else {
-            useCase.sessions().noResponse();
-            log.add("Auto simulation: current level below simulated threshold; NO_RESPONSE applied");
+            log.add("Auto simulation step rejected");
         }
     }
 
@@ -163,7 +174,15 @@ public final class MainController {
 
     private void criterionChanged(ThresholdCriterion criterion) {
         useCase.sessions().setCriterion(criterion);
+        lastThresholdCount = 0;
         log.add("Criterion changed to " + criterion);
+    }
+
+    private void earModeChanged(EarTestMode mode) {
+        useCase.sessions().setEarMode(mode);
+        lastThresholdCount = 0;
+        log.clear();
+        log.add("Ear mode changed to " + mode + "; session reset with ears " + useCase.sessions().state().config().ears());
     }
 
     private void exportCsv() {
@@ -203,7 +222,7 @@ public final class MainController {
     private static String recommendation(TestState state) {
         return switch (state.phase()) {
             case COMPLETED -> "Export results";
-            case PAUSED -> "Resume by resetting or starting a new presentation after reset";
+            case PAUSED -> "Press Resume test to continue";
             case STOPPED -> "Reset required";
             default -> "Present tone / wait for RESPONSE";
         };

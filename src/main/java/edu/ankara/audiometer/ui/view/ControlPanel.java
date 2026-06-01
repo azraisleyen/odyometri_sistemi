@@ -1,5 +1,6 @@
 package edu.ankara.audiometer.ui.view;
 
+import edu.ankara.audiometer.domain.model.EarTestMode;
 import edu.ankara.audiometer.domain.model.ThresholdCriterion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -15,19 +16,22 @@ public final class ControlPanel extends TitledPane {
     public ControlPanel(
             Runnable start,
             Runnable pause,
+            Runnable resume,
             Runnable stop,
             Runnable present,
             Runnable response,
             Runnable autoSimulate,
             Runnable reset,
-            Consumer<ThresholdCriterion> criterion
+            Consumer<ThresholdCriterion> criterion,
+            Consumer<EarTestMode> earMode
     ) {
         setText("Test Control & Simulation");
         setCollapsible(false);
 
-        ComboBox<String> ear = new ComboBox<>();
-        ear.getItems().addAll("Both", "Right", "Left");
-        ear.setValue("Both");
+        ComboBox<EarTestMode> ear = new ComboBox<>();
+        ear.getItems().addAll(EarTestMode.BOTH, EarTestMode.RIGHT_ONLY, EarTestMode.LEFT_ONLY);
+        ear.setValue(EarTestMode.BOTH);
+        ear.setOnAction(event -> earMode.accept(ear.getValue()));
 
         ComboBox<String> mode = new ComboBox<>();
         mode.getItems().addAll("Automatic Hughson-Westlake", "Manual");
@@ -42,6 +46,8 @@ public final class ControlPanel extends TitledPane {
         startButton.setOnAction(event -> start.run());
         Button pauseButton = new Button("Pause test");
         pauseButton.setOnAction(event -> pause.run());
+        Button resumeButton = new Button("Resume test");
+        resumeButton.setOnAction(event -> resume.run());
         Button stopButton = new Button("Stop test");
         stopButton.setOnAction(event -> stop.run());
         Button resetButton = new Button("Reset test");
@@ -61,7 +67,7 @@ public final class ControlPanel extends TitledPane {
         form.addRow(1, new Label("Mode"), mode);
         form.addRow(2, new Label("Criterion"), criteria);
 
-        FlowPane buttons = new FlowPane(8, 8, startButton, pauseButton, stopButton, resetButton, presentButton, responseButton, autoButton);
+        FlowPane buttons = new FlowPane(8, 8, startButton, pauseButton, resumeButton, stopButton, resetButton, presentButton, responseButton, autoButton);
         setContent(new VBox(10, form, buttons, new Label("Simulation thresholds: RIGHT 25 dB HL, LEFT 30 dB HL.")));
     }
 }

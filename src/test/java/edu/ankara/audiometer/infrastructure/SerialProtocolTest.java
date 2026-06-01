@@ -15,6 +15,7 @@ import edu.ankara.audiometer.infrastructure.export.CsvAudiogramExporter;
 import edu.ankara.audiometer.infrastructure.export.JsonSessionExporter;
 import edu.ankara.audiometer.infrastructure.serial.SerialCommand;
 import edu.ankara.audiometer.infrastructure.serial.SerialProtocol;
+import edu.ankara.audiometer.infrastructure.json.JsonSupport;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -47,15 +48,18 @@ class SerialProtocolTest {
     }
 
     @Test
-    void jsonExportContainsRequiredSessionFields() {
+    void jsonExportContainsRequiredSessionFieldsAndIsParseable() {
         TestState state = stateWithOnePoint();
         String json = new JsonSessionExporter().export(state).orElse("");
-        assertTrue(json.contains("\"software_version\""));
-        assertTrue(json.contains("\"mode\""));
-        assertTrue(json.contains("\"session_id\""));
-        assertTrue(json.contains("\"configuration\""));
-        assertTrue(json.contains("\"thresholds\""));
-        assertTrue(json.contains("\"presentation_history\""));
+        var parsed = JsonSupport.parse(json);
+        assertTrue(parsed.isOk());
+        var root = JsonSupport.asObject(parsed.orElse(java.util.Map.of()));
+        assertTrue(root.containsKey("software_version"));
+        assertTrue(root.containsKey("mode"));
+        assertTrue(root.containsKey("session_id"));
+        assertTrue(root.containsKey("configuration"));
+        assertTrue(root.containsKey("thresholds"));
+        assertTrue(root.containsKey("presentation_history"));
     }
 
     private static TestState stateWithOnePoint() {

@@ -3,8 +3,8 @@ package edu.ankara.audiometer.application;
 import edu.ankara.audiometer.domain.algorithm.HughsonWestlakeEngine;
 import edu.ankara.audiometer.domain.algorithm.TestStateReducer;
 import edu.ankara.audiometer.domain.config.AudiometryConfig;
-import edu.ankara.audiometer.domain.config.SerialProtocolConfig;
 import edu.ankara.audiometer.domain.fp.Result;
+import edu.ankara.audiometer.domain.model.EarTestMode;
 import edu.ankara.audiometer.domain.model.ProtocolEvent;
 import edu.ankara.audiometer.domain.model.TestPhase;
 import edu.ankara.audiometer.domain.model.TestState;
@@ -43,14 +43,42 @@ public final class TestSessionService {
         set(TestState.initial(state.config()));
     }
 
+    public void setEarMode(EarTestMode mode) {
+        set(TestState.initial(state.config().withEars(mode.ears())));
+    }
+
     public void pause() {
         if (state.phase() != TestPhase.STOPPED && state.phase() != TestPhase.COMPLETED) {
-            set(state.transition(state.currentEar(), state.currentFrequency(), state.currentIntensity(), TestPhase.PAUSED, state.direction()));
+            set(state.transition(
+                    state.currentEar(),
+                    state.currentFrequencyIndex(),
+                    state.currentIntensity(),
+                    TestPhase.PAUSED,
+                    state.direction()
+            ));
+        }
+    }
+
+    public void resume() {
+        if (state.phase() == TestPhase.PAUSED) {
+            set(state.transition(
+                    state.currentEar(),
+                    state.currentFrequencyIndex(),
+                    state.currentIntensity(),
+                    TestPhase.READY,
+                    state.direction()
+            ));
         }
     }
 
     public void stop() {
-        set(state.transition(state.currentEar(), state.currentFrequency(), state.currentIntensity(), TestPhase.STOPPED, state.direction()));
+        set(state.transition(
+                state.currentEar(),
+                state.currentFrequencyIndex(),
+                state.currentIntensity(),
+                TestPhase.STOPPED,
+                state.direction()
+        ));
     }
 
     public void setCriterion(ThresholdCriterion criterion) {
@@ -61,11 +89,13 @@ public final class TestSessionService {
         if (state.phase() == TestPhase.PAUSED || state.phase() == TestPhase.STOPPED || state.phase() == TestPhase.COMPLETED) {
             return Result.err("Cannot present tone while session is " + state.phase());
         }
+
         TestState next = HughsonWestlakeEngine.presentTone(state);
         var command = SerialCommand.tone(next.presentations().getLast(), next.config());
         if (!command.isOk()) {
             return Result.err("Tone command validation failed");
         }
+
         String value = command.orElse(null).value();
         var sendResult = gateway.send(value);
         set(next);
@@ -84,9 +114,24 @@ public final class TestSessionService {
         }
     }
 
+    public Result<AutoSimulationStep, String> autoSimulateStep(SimulationService simulation) {
+        var command = presentTone();
+        if (!command.isOk()) {
+            return Result.err(command.orElse("Auto simulation step rejected"));
+        }
+
+        var decision = simulation.decide(state);
+        if (decision.heard()) {
+            response();
+        } else {
+            noResponse();
+        }
+        return Result.ok(new AutoSimulationStep(command.orElse(""), decision.eventName(), decision.threshold().value()));
+    }
+
     public void applyRawMessages(List<String> rawMessages) {
         if (state.phase() != TestPhase.STOPPED) {
-            set(new SerialMessageProcessor(SerialProtocolConfig.defaults()).process(state, rawMessages));
+            set(new SerialMessageProcessor(state.config().serialProtocol()).process(state, rawMessages));
         }
     }
 
@@ -95,6 +140,11 @@ public final class TestSessionService {
     }
 
     private boolean canAcceptResponse() {
-        return state.phase() != TestPhase.PAUSED && state.phase() != TestPhase.STOPPED && state.phase() != TestPhase.COMPLETED;
+        return state.phase() != TestPhase.PAUSED
+                && state.phase() != TestPhase.STOPPED
+                && state.phase() != TestPhase.COMPLETED;
+    }
+
+    public record AutoSimulationStep(String command, String responseEvent, int simulatedThresholdDbHL) {
     }
 }
