@@ -9,7 +9,7 @@ The project uses a clean **functional-core / imperative-shell** architecture.
 * `domain/algorithm`: pure Hughson-Westlake functions, duplicate-free educational frequency progression, recent-window threshold detection, and deterministic reducers.
 * `application`: session orchestration, ear-mode changes, pause/resume/stop/reset, simulation stepping, serial-message processing, and export use cases.
 * `infrastructure`: real jSerialComm serial gateway, fake simulation gateway, Jackson-based runtime JSON config loading, CSV exporter, and Jackson-based parseable JSON export.
-* `ui`: real JavaFX desktop GUI controllers and views.
+* `ui`: real English JavaFX desktop GUI controllers and views with custom audiogram symbols/legend.
 
 The GUI does not implement the medical threshold decision. It calls application services, and those services call the pure domain layer. Serial I/O, JavaFX rendering, config/file loading, Jackson serialization, and filesystem export are isolated from the domain model.
 
@@ -21,7 +21,11 @@ The JavaFX ear ComboBox is connected to backend state through `EarTestMode`:
 * Left-only configures `[LEFT]`.
 * Both configures `[RIGHT, LEFT]` and runs RIGHT first, then LEFT.
 
-Changing ear mode reinitializes the session with the updated immutable configuration.
+Changing ear mode reinitializes the session with the updated immutable configuration. The current visible procedure is Automatic Hughson-Westlake; a separate Manual Mode is not exposed because it is not fully implemented. Present tone and Mark RESPONSE are manual control buttons within the automatic workflow, not a separate mode.
+
+## Audiogram GUI
+
+The audiogram chart uses equally spaced standard frequencies (250, 500, 1000, 2000, 4000, 8000). RIGHT thresholds are red `O` markers connected by a red line, and LEFT thresholds are blue `X` markers connected by a blue line. Constant simulated thresholds can naturally produce flat horizontal lines.
 
 ## Runtime Configuration and Export
 

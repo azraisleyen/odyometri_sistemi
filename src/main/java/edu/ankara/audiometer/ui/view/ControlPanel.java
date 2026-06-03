@@ -13,6 +13,8 @@ import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
 
 public final class ControlPanel extends TitledPane {
+    public static final String PROCEDURE_LABEL = "Procedure: Automatic Hughson-Westlake";
+
     public ControlPanel(
             Runnable start,
             Runnable pause,
@@ -33,9 +35,8 @@ public final class ControlPanel extends TitledPane {
         ear.setValue(EarTestMode.BOTH);
         ear.setOnAction(event -> earMode.accept(ear.getValue()));
 
-        ComboBox<String> mode = new ComboBox<>();
-        mode.getItems().addAll("Automatic Hughson-Westlake", "Manual");
-        mode.setValue("Automatic Hughson-Westlake");
+        Label procedure = new Label(PROCEDURE_LABEL);
+        procedure.getStyleClass().add("procedure-label");
 
         ComboBox<ThresholdCriterion> criteria = new ComboBox<>();
         criteria.getItems().addAll(ThresholdCriterion.values());
@@ -64,7 +65,7 @@ public final class ControlPanel extends TitledPane {
         form.setHgap(8);
         form.setVgap(8);
         form.addRow(0, new Label("Ear"), ear);
-        form.addRow(1, new Label("Mode"), mode);
+        form.addRow(1, procedure);
         form.addRow(2, new Label("Criterion"), criteria);
 
         FlowPane buttons = new FlowPane(8, 8, startButton, pauseButton, resumeButton, stopButton, resetButton, presentButton, responseButton, autoButton);

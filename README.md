@@ -1,4 +1,4 @@
-# Odyometre Sistemi Tasarımı ve Testi
+# Audiometer System Design and Testing
 
 **Audiometer System Design and Testing** is a Java 21 + JavaFX desktop application for an educational audiometry course project. It demonstrates a configurable Hughson-Westlake workflow, serial communication with Proteus/Arduino-style hardware, simulation mode without hardware, real-time audiogram rendering, CSV/JSON export, and automated tests.
 
@@ -23,7 +23,7 @@ gradle --no-daemon run
 gradle --no-daemon exportSample
 ```
 
-`runSimulation` and `run` open a real JavaFX window titled **Odyometre Sistemi Tasarımı ve Testi**. The project intentionally contains no JavaFX, jSerialComm, JUnit, or jqwik stub packages.
+`runSimulation` and `run` open a real English JavaFX window titled **Audiometer System Design and Testing**. The project intentionally contains no JavaFX, jSerialComm, JUnit, or jqwik stub packages.
 
 ## Runtime Configuration
 
@@ -39,7 +39,7 @@ This prevents the old duplicate-1000 loop while ensuring 500 Hz and 250 Hz are r
 
 ## Simulation Mode and Ear Modes
 
-Use simulation mode when Proteus or a COM port is not connected.
+Use simulation mode when Proteus or a COM port is not connected. The GUI language is English.
 
 1. Run `gradle --no-daemon runSimulation`.
 2. Select **Ear** mode:
@@ -50,6 +50,10 @@ Use simulation mode when Proteus or a COM port is not connected.
 4. Press **Start test** or **Auto simulate step** repeatedly.
 
 Default simulation thresholds are RIGHT 25 dB HL and LEFT 30 dB HL. Completed sessions reach 1000, 2000, 4000, 8000, 500, and 250 Hz for each selected ear.
+
+## Procedure and Manual Controls
+
+The current visible procedure is **Procedure: Automatic Hughson-Westlake**. A separate Manual Mode is not exposed because it is not fully implemented. **Present tone** and **Mark RESPONSE** are manual control buttons within the automatic Hughson-Westlake workflow, not a separate Manual Mode. Manual Mode can be considered future work.
 
 ## Pause / Resume / Stop
 
@@ -104,4 +108,4 @@ JSON export is generated with Jackson `ObjectMapper` instead of fragile manual s
 * Functional programming: `docs/FUNCTIONAL_PROGRAMMING_DESIGN.md`, immutable records in `domain/model`, pure functions in `domain/algorithm`, and the map/filter/reduce parser pipeline in `application/SerialMessageProcessor.java`.
 * Testing evidence: `docs/TESTING_REPORT.md` and tests under `src/test/java` using real JUnit 5, jqwik, and Jackson JSON assertions.
 * Communication protocol: `docs/SERIAL_PROTOCOL.md` and `infrastructure/serial`.
-* Audiogram/results evidence: GUI chart/table plus CSV/JSON exporters under `infrastructure/export`.
+* Audiogram/results evidence: GUI chart/table plus CSV/JSON exporters under `infrastructure/export`. RIGHT thresholds render as red `O` markers connected by a red line; LEFT thresholds render as blue `X` markers connected by a blue line. Flat horizontal lines are expected when simulated thresholds are constant across frequencies.
