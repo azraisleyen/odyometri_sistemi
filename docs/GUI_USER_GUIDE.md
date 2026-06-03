@@ -14,7 +14,7 @@ A real JavaFX window titled **Odyometre Sistemi Tasarımı ve Testi** opens. Sim
 gradle --no-daemon run
 ```
 
-Select a COM port, choose the configured baud rate, and press **Connect**. Proteus/Arduino must send `RESPONSE` when the patient button is pressed.
+Select a COM port, choose the configured baud rate, and press **Connect**. Proteus/Arduino must send `RESPONSE` when the patient button is pressed. The command body logged in the event log remains `TONE;EAR=...`; the configured command terminator is appended only to the bytes sent to the serial port.
 
 ## Ear Modes
 
@@ -39,4 +39,8 @@ Changing ear mode resets the session with the selected ears.
 
 ## Results and Export
 
-The audiogram updates in real time. Right ear is rendered as red `O`; left ear is rendered as blue `X`. Standard frequencies are displayed with equal audiometry-style spacing while the results table keeps real Hz and dB HL values. Use **Export CSV** or **Export JSON** to write report evidence under `exports/`.
+The audiogram updates in real time. Right ear is rendered as red `O`; left ear is rendered as blue `X`. Standard frequencies are displayed with equal audiometry-style spacing while the results table keeps real Hz and dB HL values.
+
+Use **Export CSV** or **Export JSON** to write report evidence under `exports/`. JSON export is generated with Jackson and includes configuration, thresholds, and presentation history.
+
+This GUI is for educational simulation only and must not be used for diagnosis or treatment.

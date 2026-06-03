@@ -27,15 +27,15 @@ gradle --no-daemon exportSample
 
 ## Runtime Configuration
 
-The application loads `config/audiometry-config.json` at startup. If the file is missing or invalid, the GUI falls back safely to `AudiometryConfig.defaults()` and logs a warning. Runtime-loaded values include frequency range, frequency plans, start intensity, intensity limits, 10/5 dB Hughson-Westlake steps, timeout, default criterion, and default serial baud rate.
+The application loads `config/audiometry-config.json` at startup with Jackson `ObjectMapper`. If the file is missing or invalid, the GUI falls back safely to `AudiometryConfig.defaults()` and logs a warning. Runtime-loaded values include frequency range, frequency plans, start intensity, intensity limits, 10/5 dB Hughson-Westlake steps, timeout, default criterion, default serial baud rate, and command terminator.
 
-The configured clinical order may include a 1000 Hz retest for documentation/future validation. Runtime progression is duplicate-safe and uses the educational threshold order:
+The configured clinical order may include a 1000 Hz retest for documentation/future validation. The current educational runtime intentionally uses duplicate-free `activeThresholdOrder()` for final threshold progression:
 
 ```text
 1000, 2000, 4000, 8000, 500, 250
 ```
 
-This prevents the old duplicate-1000 loop while ensuring 500 Hz and 250 Hz are reached.
+This prevents the old duplicate-1000 loop while ensuring 500 Hz and 250 Hz are reached. The software preserves the retest in configuration/documentation but does not claim certified clinical retest or IEC 60645-1 compliance.
 
 ## Simulation Mode and Ear Modes
 
@@ -66,7 +66,7 @@ Run:
 gradle --no-daemon run
 ```
 
-Select the COM port connected to Proteus COMPIM / Arduino, choose the configured baud rate, and press **Connect**. Serial settings are 8 data bits, 1 stop bit, no parity.
+Select the COM port connected to Proteus COMPIM / Arduino, choose the configured baud rate, and press **Connect**. Serial settings are 8 data bits, 1 stop bit, no parity. The actual serial bytes append the configured command terminator (`\n` by default), while the GUI log keeps the command body clean.
 
 Outgoing command format is unchanged:
 
@@ -96,12 +96,12 @@ CSV columns remain:
 session_id,ear,frequency_hz,threshold_db_hl,criterion,presentation_count,completed_at_order,notes
 ```
 
-JSON export is generated through a reusable JSON serializer utility instead of fragile manual string concatenation. The JSON is pretty-printed and parseable; it includes software version, mode, session id, configuration, thresholds, and presentation history.
+JSON export is generated with Jackson `ObjectMapper` instead of fragile manual string concatenation or a custom parser. The JSON is pretty-printed and parseable; it includes software version, mode, session id, configuration, thresholds, and presentation history.
 
 ## Report Relevance
 
 * Software design: `docs/SOFTWARE_DESIGN.md`, `src/main/java/edu/ankara/audiometer/application`, `domain`, `infrastructure`, and `ui`.
 * Functional programming: `docs/FUNCTIONAL_PROGRAMMING_DESIGN.md`, immutable records in `domain/model`, pure functions in `domain/algorithm`, and the map/filter/reduce parser pipeline in `application/SerialMessageProcessor.java`.
-* Testing evidence: `docs/TESTING_REPORT.md` and tests under `src/test/java` using real JUnit 5 and jqwik dependencies.
+* Testing evidence: `docs/TESTING_REPORT.md` and tests under `src/test/java` using real JUnit 5, jqwik, and Jackson JSON assertions.
 * Communication protocol: `docs/SERIAL_PROTOCOL.md` and `infrastructure/serial`.
 * Audiogram/results evidence: GUI chart/table plus CSV/JSON exporters under `infrastructure/export`.
