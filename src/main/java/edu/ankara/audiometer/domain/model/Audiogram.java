@@ -1,9 +1,39 @@
 package edu.ankara.audiometer.domain.model;
-import java.util.*;import java.util.stream.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 public record Audiogram(List<AudiogramPoint> points) {
- public Audiogram { points = List.copyOf(points); }
- public static Audiogram empty(){return new Audiogram(List.of());}
- public Audiogram add(AudiogramPoint p, boolean allowRetest){ boolean dup=points.stream().anyMatch(x->x.ear()==p.ear()&&x.frequency().equals(p.frequency())); if(dup&&!allowRetest) return this; var n=new ArrayList<>(points); n.add(p); return new Audiogram(n); }
- public Optional<AudiogramPoint> find(Ear e, FrequencyHz f){return points.stream().filter(p->p.ear()==e&&p.frequency().equals(f)).findFirst();}
- public Map<Ear,List<AudiogramPoint>> byEar(){return points.stream().collect(Collectors.groupingBy(AudiogramPoint::ear));}
+    public Audiogram {
+        points = List.copyOf(points);
+    }
+
+    public static Audiogram empty() {
+        return new Audiogram(List.of());
+    }
+
+    public Audiogram add(AudiogramPoint point, boolean allowRetest) {
+        boolean duplicate = points.stream()
+                .anyMatch(existing -> existing.ear() == point.ear() && existing.frequency().equals(point.frequency()));
+        if (duplicate && !allowRetest) {
+            return this;
+        }
+
+        var next = new ArrayList<>(points);
+        next.add(point);
+        return new Audiogram(next);
+    }
+
+    public Optional<AudiogramPoint> find(Ear ear, FrequencyHz frequency) {
+        return points.stream()
+                .filter(point -> point.ear() == ear && point.frequency().equals(frequency))
+                .findFirst();
+    }
+
+    public Map<Ear, List<AudiogramPoint>> byEar() {
+        return points.stream().collect(Collectors.groupingBy(AudiogramPoint::ear));
+    }
 }
