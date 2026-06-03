@@ -31,16 +31,21 @@ public record FrequencyPlan(
     }
 
     /**
-     * Runtime progression order is duplicate-safe. The configured 1000 Hz retest is preserved in
-     * clinicalOrder for documentation/configuration, while the educational runtime avoids duplicate
-     * threshold rows when retesting is disabled.
+     * Duplicate-free educational runtime order used for final threshold rows. The configured
+     * clinical order may preserve a 1000 Hz retest for documentation/future validation, but this
+     * project intentionally avoids duplicate runtime threshold rows when retest support is disabled.
      */
-    public List<FrequencyHz> activeOrder() {
+    public List<FrequencyHz> activeThresholdOrder() {
         Stream<FrequencyHz> base = clinicalOrder.stream();
         Stream<FrequencyHz> all = enableInterOctaves
                 ? Stream.concat(base, optionalInterOctaves.stream())
                 : base;
         return List.copyOf(new LinkedHashSet<>(all.toList()));
+    }
+
+    /** Backward-compatible alias for existing callers and tests. */
+    public List<FrequencyHz> activeOrder() {
+        return activeThresholdOrder();
     }
 
     private static List<FrequencyHz> vals(int... values) {

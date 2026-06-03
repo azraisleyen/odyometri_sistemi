@@ -18,6 +18,10 @@
     -fx-text-fill: #075985;
     -fx-font-weight: bold;
 }
+.procedure-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #123047;
+}
 .titled-pane > .title {
     -fx-background-color: #e8eef7;
 }
@@ -34,25 +38,64 @@
     -fx-font-family: "Consolas";
     -fx-font-size: 13px;
 }
-.right-ear-symbol {
-    -fx-text-fill: #dc2626;
-    -fx-font-weight: bold;
-    -fx-font-size: 18px;
+.audiogram-content {
+    -fx-padding: 0 0 8 0;
+}
+.chart-plot-background {
     -fx-background-color: white;
-    -fx-background-radius: 12;
-    -fx-padding: 1 4;
+}
+.chart-horizontal-grid-lines,
+.chart-vertical-grid-lines {
+    -fx-stroke: #d5dde8;
+}
+.right-ear-series.chart-series-line {
+    -fx-stroke: #dc2626;
+    -fx-stroke-width: 2.5px;
+}
+.left-ear-series.chart-series-line {
+    -fx-stroke: #2563eb;
+    -fx-stroke-width: 2.5px;
+}
+.audiogram-marker {
+    -fx-min-width: 22px;
+    -fx-min-height: 22px;
+    -fx-pref-width: 22px;
+    -fx-pref-height: 22px;
+    -fx-max-width: 22px;
+    -fx-max-height: 22px;
+    -fx-background-color: rgba(255, 255, 255, 0.78);
+    -fx-background-radius: 11px;
+    -fx-alignment: center;
+}
+.right-ear-symbol,
+.left-ear-symbol {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+}
+.right-ear-symbol {
+    -fx-fill: #dc2626;
 }
 .left-ear-symbol {
-    -fx-text-fill: #2563eb;
+    -fx-fill: #2563eb;
+}
+.legend-marker {
+    -fx-min-width: 18px;
+    -fx-min-height: 18px;
+    -fx-pref-width: 18px;
+    -fx-pref-height: 18px;
+    -fx-max-width: 18px;
+    -fx-max-height: 18px;
+}
+.legend-marker .right-ear-symbol,
+.legend-marker .left-ear-symbol {
+    -fx-font-size: 15px;
+}
+.audiogram-legend {
+    -fx-padding: 0 0 4 0;
+}
+.audiogram-legend-item {
     -fx-font-weight: bold;
-    -fx-font-size: 18px;
-    -fx-background-color: white;
-    -fx-background-radius: 12;
-    -fx-padding: 1 4;
-}
-.default-color0.chart-series-line {
-    -fx-stroke: #dc2626;
-}
-.default-color1.chart-series-line {
-    -fx-stroke: #2563eb;
+    -fx-text-fill: #334155;
 }
