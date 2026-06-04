@@ -97,9 +97,13 @@ public final class TestSessionService {
         }
 
         String value = command.orElse(null).value();
-        var sendResult = gateway.send(value);
+        var sendResult = gateway.send(value, next.config().serialProtocol().commandTerminator());
+        if (!sendResult.isOk()) {
+            return Result.err("Serial send failed for command: " + value);
+        }
+
         set(next);
-        return sendResult.isOk() ? Result.ok(value) : Result.err("Serial send failed for command: " + value);
+        return Result.ok(value);
     }
 
     public void response() {

@@ -10,5 +10,5 @@
   "notHeardIncreaseDb": 5,
   "responseTimeoutMs": 2500,
   "defaultCriterion": "TWO_OUT_OF_THREE_ASCENDING",
-  "serial": { "baudRate": 9600, "commandFormat": "TONE;EAR=<RIGHT|LEFT>;FREQ=<Hz>;DB=<dBHL>;DURATION_MS=<ms>", "incomingResponse": "RESPONSE" }
+  "serial": { "baudRate": 9600, "commandTerminator": "\n", "commandFormat": "TONE;EAR=<RIGHT|LEFT>;FREQ=<Hz>;DB=<dBHL>;DURATION_MS=<ms>", "incomingResponse": "RESPONSE" }
 }

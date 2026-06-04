@@ -1,15 +1,30 @@
 package edu.ankara.audiometer.infrastructure.export;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ankara.audiometer.domain.fp.Result;
 import edu.ankara.audiometer.domain.model.TestState;
-import edu.ankara.audiometer.infrastructure.json.JsonSupport;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class JsonSessionExporter {
+    private final ObjectMapper objectMapper;
+
+    public JsonSessionExporter() {
+        this(new ObjectMapper());
+    }
+
+    public JsonSessionExporter(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     public Result<String, String> export(TestState state) {
-        return Result.ok(JsonSupport.prettyPrint(sessionDocument(state)));
+        try {
+            return Result.ok(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(sessionDocument(state)));
+        } catch (JsonProcessingException exception) {
+            return Result.err(exception.getMessage());
+        }
     }
 
     private static Map<String, Object> sessionDocument(TestState state) {
@@ -47,13 +62,16 @@ public final class JsonSessionExporter {
         config.put("min_frequency_hz", state.config().minFrequency().value());
         config.put("max_frequency_hz", state.config().maxFrequency().value());
         config.put("required_frequencies_hz", state.config().frequencyPlan().requiredFrequencies().stream().map(f -> f.value()).toList());
-        config.put("active_order_hz", state.config().frequencyPlan().activeOrder().stream().map(f -> f.value()).toList());
+        config.put("clinical_order_hz", state.config().frequencyPlan().clinicalOrder().stream().map(f -> f.value()).toList());
+        config.put("active_threshold_order_hz", state.config().frequencyPlan().activeThresholdOrder().stream().map(f -> f.value()).toList());
         config.put("min_db_hl", state.config().minIntensity().value());
         config.put("max_db_hl", state.config().maxIntensity().value());
         config.put("start_db_hl", state.config().algorithm().startIntensity().value());
         config.put("heard_decrease_db", state.config().algorithm().heardDecreaseDb());
         config.put("not_heard_increase_db", state.config().algorithm().notHeardIncreaseDb());
         config.put("criterion", state.config().algorithm().criterion().name());
+        config.put("serial_baud_rate", state.config().serialProtocol().baudRate());
+        config.put("command_terminator", state.config().serialProtocol().commandTerminator());
         config.put("ears", state.config().ears().stream().map(Enum::name).toList());
         return config;
     }

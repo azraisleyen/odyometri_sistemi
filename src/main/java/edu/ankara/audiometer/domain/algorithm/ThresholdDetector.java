@@ -22,6 +22,7 @@ public final class ThresholdDetector {
                 .filter(presentation -> presentation.ear() == last.ear())
                 .filter(presentation -> presentation.frequency().equals(last.frequency()))
                 .filter(TonePresentation::validAscendingTrial)
+                .filter(presentation -> presentation.response().isPresent())
                 .toList();
 
         return relevantAscendingTrials.stream()
@@ -41,20 +42,25 @@ public final class ThresholdDetector {
     ) {
         var trials = relevantAscendingTrials.stream()
                 .filter(presentation -> presentation.intensity().equals(intensity))
-                .filter(presentation -> presentation.response().isPresent())
                 .toList();
-        int heard = (int) trials.stream()
+
+        if (trials.size() < config.criterion().window) {
+            return ThresholdDecision.notReached(config.criterion(), "not enough at " + intensity.value());
+        }
+
+        var recentWindow = trials.subList(trials.size() - config.criterion().window, trials.size());
+        int heard = (int) recentWindow.stream()
                 .filter(presentation -> presentation.response().orElseThrow().heard())
                 .count();
 
-        if (trials.size() >= config.criterion().window && heard >= config.criterion().required) {
+        if (heard >= config.criterion().required) {
             return ThresholdDecision.reached(
                     intensity,
                     config.criterion(),
-                    heard + "/" + trials.size() + " ascending responses at " + intensity.value() + " dB HL"
+                    heard + "/" + recentWindow.size() + " recent ascending responses at " + intensity.value() + " dB HL"
             );
         }
-        return ThresholdDecision.notReached(config.criterion(), "not enough at " + intensity.value());
+        return ThresholdDecision.notReached(config.criterion(), "not enough recent responses at " + intensity.value());
     }
 
     public static boolean isThresholdReached(List<TonePresentation> presentations, HughsonWestlakeConfig config) {

@@ -9,6 +9,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
 import java.util.function.Consumer;
 
@@ -33,12 +34,14 @@ public final class ControlPanel extends TitledPane {
         ear.setValue(EarTestMode.BOTH);
         ear.setOnAction(event -> earMode.accept(ear.getValue()));
 
-        ComboBox<String> mode = new ComboBox<>();
-        mode.getItems().addAll("Automatic Hughson-Westlake", "Manual");
-        mode.setValue("Automatic Hughson-Westlake");
+        Label procedureValue = new Label(AudiometerUiLabels.PROCEDURE_VALUE);
+        procedureValue.getStyleClass().add("procedure-label");
+        procedureValue.setMinWidth(205);
 
         ComboBox<ThresholdCriterion> criteria = new ComboBox<>();
         criteria.getItems().addAll(ThresholdCriterion.values());
+        criteria.setConverter(thresholdCriterionConverter());
+        criteria.setPrefWidth(205);
         criteria.setValue(ThresholdCriterion.TWO_OUT_OF_THREE_ASCENDING);
         criteria.setOnAction(event -> criterion.accept(criteria.getValue()));
 
@@ -64,10 +67,44 @@ public final class ControlPanel extends TitledPane {
         form.setHgap(8);
         form.setVgap(8);
         form.addRow(0, new Label("Ear"), ear);
-        form.addRow(1, new Label("Mode"), mode);
+        form.addRow(1, new Label(AudiometerUiLabels.PROCEDURE_LABEL), procedureValue);
         form.addRow(2, new Label("Criterion"), criteria);
 
-        FlowPane buttons = new FlowPane(8, 8, startButton, pauseButton, resumeButton, stopButton, resetButton, presentButton, responseButton, autoButton);
+        FlowPane buttons = new FlowPane(
+                8,
+                8,
+                startButton,
+                pauseButton,
+                resumeButton,
+                stopButton,
+                resetButton,
+                presentButton,
+                responseButton,
+                autoButton
+        );
         setContent(new VBox(10, form, buttons, new Label("Simulation thresholds: RIGHT 25 dB HL, LEFT 30 dB HL.")));
+    }
+
+    private static StringConverter<ThresholdCriterion> thresholdCriterionConverter() {
+        return new StringConverter<>() {
+            @Override
+            public String toString(ThresholdCriterion criterion) {
+                if (criterion == null) {
+                    return "";
+                }
+                return switch (criterion) {
+                    case TWO_OUT_OF_THREE_ASCENDING -> "2 of 3 Ascending";
+                    case THREE_OUT_OF_FIVE_ASCENDING -> "3 of 5 Ascending";
+                };
+            }
+
+            @Override
+            public ThresholdCriterion fromString(String value) {
+                if ("3 of 5 Ascending".equals(value)) {
+                    return ThresholdCriterion.THREE_OUT_OF_FIVE_ASCENDING;
+                }
+                return ThresholdCriterion.TWO_OUT_OF_THREE_ASCENDING;
+            }
+        };
     }
 }
