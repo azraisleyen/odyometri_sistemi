@@ -1,6 +1,21 @@
+.root,
 .app {
     -fx-font-family: "Segoe UI", "Inter", sans-serif;
     -fx-background-color: #f4f7fb;
+    -fx-text-fill: #1f2937;
+}
+.label {
+    -fx-text-fill: #1f2937;
+    -fx-opacity: 1.0;
+}
+.label .text {
+    -fx-fill: #1f2937;
+}
+.label:disabled,
+.label:disabled .text {
+    -fx-text-fill: #334155;
+    -fx-fill: #334155;
+    -fx-opacity: 1.0;
 }
 .title {
     -fx-font-size: 26px;
@@ -18,25 +33,140 @@
     -fx-text-fill: #075985;
     -fx-font-weight: bold;
 }
-.procedure-label {
+.procedure-label,
+.export-status,
+.result-count {
     -fx-font-weight: bold;
     -fx-text-fill: #123047;
+}
+.titled-pane {
+    -fx-text-fill: #1f2937;
 }
 .titled-pane > .title {
     -fx-background-color: #e8eef7;
 }
+.titled-pane > .title > .text {
+    -fx-fill: #123047;
+    -fx-font-weight: bold;
+}
+.titled-pane > .content {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d5dde8;
+    -fx-text-fill: #1f2937;
+}
+.titled-pane > .content .label,
+.titled-pane > .content .label .text {
+    -fx-text-fill: #1f2937;
+    -fx-fill: #1f2937;
+}
+.titled-pane > .content .label:disabled,
+.titled-pane > .content .label:disabled .text {
+    -fx-text-fill: #334155;
+    -fx-fill: #334155;
+    -fx-opacity: 1.0;
+}
 .button {
     -fx-background-radius: 7;
     -fx-padding: 7 11;
+    -fx-text-fill: #111827;
 }
 .response {
     -fx-background-color: #16a34a;
     -fx-text-fill: white;
     -fx-font-weight: bold;
 }
+.response .text,
+.titled-pane > .content .response .text {
+    -fx-fill: white;
+}
 .state {
     -fx-font-family: "Consolas";
     -fx-font-size: 13px;
+    -fx-text-fill: #111827;
+    -fx-opacity: 1.0;
+}
+.state .text {
+    -fx-fill: #111827;
+}
+.check-box {
+    -fx-text-fill: #1f2937;
+    -fx-opacity: 1.0;
+}
+.check-box .text {
+    -fx-fill: #1f2937;
+}
+.check-box:disabled {
+    -fx-opacity: 1.0;
+}
+.check-box:disabled .box {
+    -fx-opacity: 0.65;
+}
+.check-box:disabled .text {
+    -fx-fill: #334155;
+    -fx-opacity: 1.0;
+}
+.combo-box-base {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #111827;
+    -fx-opacity: 1.0;
+}
+.combo-box .list-cell {
+    -fx-text-fill: #111827;
+    -fx-background-color: transparent;
+}
+.combo-box .list-cell .text {
+    -fx-fill: #111827;
+}
+.combo-box-base:disabled,
+.combo-box-base:disabled .list-cell,
+.combo-box-base:disabled .list-cell .text {
+    -fx-text-fill: #334155;
+    -fx-fill: #334155;
+    -fx-opacity: 1.0;
+}
+.combo-box-popup .list-view .list-cell {
+    -fx-text-fill: #111827;
+    -fx-background-color: #ffffff;
+}
+.combo-box-popup .list-view .list-cell .text {
+    -fx-fill: #111827;
+}
+.combo-box-popup .list-view .list-cell:hover,
+.combo-box-popup .list-view .list-cell:selected {
+    -fx-text-fill: #111827;
+    -fx-background-color: #dbeafe;
+}
+.text-area {
+    -fx-text-fill: #111827;
+    -fx-control-inner-background: #ffffff;
+    -fx-highlight-fill: #bfdbfe;
+    -fx-highlight-text-fill: #111827;
+}
+.text-area .text {
+    -fx-fill: #111827;
+}
+.text-area .content {
+    -fx-background-color: #ffffff;
+}
+.table-view {
+    -fx-text-fill: #111827;
+    -fx-control-inner-background: #ffffff;
+    -fx-background-color: #ffffff;
+}
+.table-view .column-header,
+.table-view .column-header-background {
+    -fx-background-color: #e8eef7;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #123047;
+    -fx-font-weight: bold;
+}
+.table-view .table-cell {
+    -fx-text-fill: #111827;
+}
+.table-view .table-cell .text,
+.table-view .column-header .label .text {
+    -fx-fill: #111827;
 }
 .audiogram-content {
     -fx-padding: 0 0 8 0;
@@ -106,20 +236,4 @@
 .audiogram-legend-item {
     -fx-font-weight: bold;
     -fx-text-fill: #334155;
-}
-.left-scroll {
-    -fx-background-color: transparent;
-    -fx-background: transparent;
-}
-.completion-badge {
-    -fx-background-color: #16a34a;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-padding: 5 10;
-    -fx-background-radius: 12;
-}
-.export-status,
-.result-count {
-    -fx-text-fill: #334155;
-    -fx-font-weight: bold;
 }

@@ -7,9 +7,7 @@ public sealed interface ProtocolEvent permits
         ProtocolEvent.Ack,
         ProtocolEvent.ButtonDown,
         ProtocolEvent.ButtonUp,
-        ProtocolEvent.ErrorMessage,
-        ProtocolEvent.RetestValidation,
-        ProtocolEvent.RetestWarning {
+        ProtocolEvent.ErrorMessage {
 
     record Response() implements ProtocolEvent {
     }
@@ -30,11 +28,5 @@ public sealed interface ProtocolEvent permits
     }
 
     record ErrorMessage(String message) implements ProtocolEvent {
-    }
-
-    record RetestValidation(Ear ear, FrequencyHz frequency, IntensityDbHL threshold) implements ProtocolEvent {
-    }
-
-    record RetestWarning(Ear ear, FrequencyHz frequency, IntensityDbHL originalThreshold, IntensityDbHL retestThreshold) implements ProtocolEvent {
     }
 }

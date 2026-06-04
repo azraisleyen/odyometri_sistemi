@@ -9,21 +9,8 @@ public record TonePresentation(
         int orderIndex,
         Optional<PatientResponse> response,
         PresentationDirection direction,
-        boolean validAscendingTrial,
-        int frequencyOrderIndex
+        boolean validAscendingTrial
 ) {
-    public TonePresentation(
-            Ear ear,
-            FrequencyHz frequency,
-            IntensityDbHL intensity,
-            int orderIndex,
-            Optional<PatientResponse> response,
-            PresentationDirection direction,
-            boolean validAscendingTrial
-    ) {
-        this(ear, frequency, intensity, orderIndex, response, direction, validAscendingTrial, -1);
-    }
-
     public TonePresentation {
         response = response == null ? Optional.empty() : response;
     }
@@ -36,8 +23,7 @@ public record TonePresentation(
                 orderIndex,
                 Optional.of(nextResponse),
                 direction,
-                validAscendingTrial,
-                frequencyOrderIndex
+                validAscendingTrial
         );
     }
 }

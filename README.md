@@ -29,13 +29,13 @@ gradle --no-daemon exportSample
 
 The application loads `config/audiometry-config.json` at startup with Jackson `ObjectMapper`. If the file is missing or invalid, the GUI falls back safely to `AudiometryConfig.defaults()` and logs a warning. Runtime-loaded values include frequency range, frequency plans, start intensity, intensity limits, 10/5 dB Hughson-Westlake steps, timeout, default criterion, default serial baud rate, and command terminator.
 
-The runtime Hughson-Westlake sequence now implements the configured 1000 Hz retest as a real validation step for each selected ear:
+The configured clinical order may include a 1000 Hz retest for documentation/future validation. The current educational runtime intentionally uses duplicate-free `activeThresholdOrder()` for final threshold progression:
 
 ```text
 1000, 2000, 4000, 8000, 1000 retest, 500, 250
 ```
 
-The test flow uses index-based progression through the clinical order, so the duplicate 1000 Hz retest cannot create the old infinite loop. The retest generates tone presentations and event-history validation messages, while the final audiogram/results table keeps one unique threshold per ear/frequency: 1000, 2000, 4000, 8000, 500, and 250 Hz. This is still an educational validation step and does not claim certified clinical retest or IEC 60645-1 compliance.
+This prevents the old duplicate-1000 loop while ensuring 500 Hz and 250 Hz are reached. The software preserves the retest in configuration/documentation but does not claim certified clinical retest or IEC 60645-1 compliance.
 
 ## Simulation Mode and Ear Modes
 
@@ -50,6 +50,10 @@ Use simulation mode when Proteus or a COM port is not connected. The GUI languag
 4. Press **Start test** or **Auto simulate step** repeatedly.
 
 Default simulation thresholds are RIGHT 25 dB HL and LEFT 30 dB HL. No demo profile, random threshold, or artificial audiogram slope is added, so flat horizontal simulated audiogram lines are expected. Completed sessions visit 1000, 2000, 4000, 8000, 1000 retest, 500, and 250 Hz for each selected ear; final results show the six unique threshold rows per ear.
+
+## Procedure and Manual Controls
+
+The current visible procedure is **Procedure: Automatic Hughson-Westlake**. A separate Manual Mode is not exposed because it is not fully implemented. **Present tone** and **Mark RESPONSE** are manual control buttons within the automatic Hughson-Westlake workflow, not a separate Manual Mode. Manual Mode can be considered future work.
 
 ## Procedure and Manual Controls
 
@@ -110,4 +114,4 @@ JSON export is generated with Jackson `ObjectMapper` instead of fragile manual s
 * Functional programming: `docs/FUNCTIONAL_PROGRAMMING_DESIGN.md`, immutable records in `domain/model`, pure functions in `domain/algorithm`, and the map/filter/reduce parser pipeline in `application/SerialMessageProcessor.java`.
 * Testing evidence: `docs/TESTING_REPORT.md` and tests under `src/test/java` using real JUnit 5, jqwik, and Jackson JSON assertions.
 * Communication protocol: `docs/SERIAL_PROTOCOL.md` and `infrastructure/serial`.
-* Audiogram/results evidence: GUI chart/table plus CSV/JSON exporters under `infrastructure/export`. RIGHT thresholds render as red `O` markers connected by a red line; LEFT thresholds render as blue `X` markers connected by a blue line. Both mode produces 12 unique final threshold rows: six for RIGHT and six for LEFT. Flat horizontal lines are expected when simulated thresholds are constant across frequencies.
+* Audiogram/results evidence: GUI chart/table plus CSV/JSON exporters under `infrastructure/export`. RIGHT thresholds render as red `O` markers connected by a red line; LEFT thresholds render as blue `X` markers connected by a blue line. Flat horizontal lines are expected when simulated thresholds are constant across frequencies.

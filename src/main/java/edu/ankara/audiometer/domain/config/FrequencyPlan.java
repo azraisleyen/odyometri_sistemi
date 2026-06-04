@@ -31,34 +31,21 @@ public record FrequencyPlan(
     }
 
     /**
-     * Runtime Hughson-Westlake sequence. It intentionally preserves the configured duplicate
-     * 1000 Hz occurrence so that the second 1000 Hz presentation is a true retest step.
+     * Duplicate-free educational runtime order used for final threshold rows. The configured
+     * clinical order may preserve a 1000 Hz retest for documentation/future validation, but this
+     * project intentionally avoids duplicate runtime threshold rows when retest support is disabled.
      */
-    public List<FrequencyHz> activeOrder() {
-        return enableInterOctaves
-                ? Stream.concat(clinicalOrder.stream(), optionalInterOctaves.stream()).toList()
-                : clinicalOrder;
-    }
-
-    /** Unique final audiogram frequencies. Duplicate retest occurrences are not final rows. */
-    public List<FrequencyHz> uniqueThresholdFrequencies() {
-        return List.copyOf(new LinkedHashSet<>(activeOrder()));
-    }
-
-    /** Backward-compatible alias for unique final threshold/audiogram frequencies. */
     public List<FrequencyHz> activeThresholdOrder() {
-        return uniqueThresholdFrequencies();
+        Stream<FrequencyHz> base = clinicalOrder.stream();
+        Stream<FrequencyHz> all = enableInterOctaves
+                ? Stream.concat(base, optionalInterOctaves.stream())
+                : base;
+        return List.copyOf(new LinkedHashSet<>(all.toList()));
     }
 
-    public boolean isRetestOccurrence(int orderIndex) {
-        if (orderIndex < 0 || orderIndex >= activeOrder().size()) {
-            return false;
-        }
-        return firstOccurrenceIndex(activeOrder().get(orderIndex)) < orderIndex;
-    }
-
-    public int firstOccurrenceIndex(FrequencyHz frequency) {
-        return activeOrder().indexOf(frequency);
+    /** Backward-compatible alias for existing callers and tests. */
+    public List<FrequencyHz> activeOrder() {
+        return activeThresholdOrder();
     }
 
     private static List<FrequencyHz> vals(int... values) {
