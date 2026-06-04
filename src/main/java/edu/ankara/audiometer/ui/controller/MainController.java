@@ -93,9 +93,9 @@ public final class MainController {
     }
 
     private Parent header() {
-        Label title = new Label("Odyometre Sistemi Tasarımı ve Testi");
+        Label title = new Label("Audiometer System Design and Testing");
         title.getStyleClass().add("title");
-        Label sub = new Label("Functional Programming Based Audiometry Test Software");
+        Label sub = new Label("Functional Programming-Based Audiometry Test Software");
         sub.getStyleClass().add("subtitle");
         mode.getStyleClass().add("mode");
         VBox box = new VBox(3, title, sub, mode);

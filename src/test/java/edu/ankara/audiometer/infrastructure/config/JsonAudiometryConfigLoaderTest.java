@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JsonAudiometryConfigLoaderTest {
     @Test
-    void readsValidConfigJson() throws Exception {
+    void readsValidConfigJsonWithJackson() throws Exception {
         var path = Files.createTempFile("audiometry-config", ".json");
         Files.writeString(path, """
                 {
@@ -26,7 +26,7 @@ class JsonAudiometryConfigLoaderTest {
                   "notHeardIncreaseDb": 5,
                   "responseTimeoutMs": 2500,
                   "defaultCriterion": "TWO_OUT_OF_THREE_ASCENDING",
-                  "serial": { "baudRate": 115200 }
+                  "serial": { "baudRate": 115200, "commandTerminator": "\\r\\n" }
                 }
                 """);
 
@@ -35,6 +35,7 @@ class JsonAudiometryConfigLoaderTest {
         assertTrue(result.loadedFromFile());
         assertEquals(55, result.config().algorithm().startIntensity().value());
         assertEquals(115200, result.config().serialProtocol().baudRate());
+        assertEquals("\r\n", result.config().serialProtocol().commandTerminator());
         assertEquals(55, TestState.initial(result.config()).currentIntensity().value());
     }
 
@@ -50,5 +51,20 @@ class JsonAudiometryConfigLoaderTest {
         var invalid = loader.load(invalidPath);
         assertFalse(invalid.loadedFromFile());
         assertEquals(AudiometryConfig.defaults().algorithm().startIntensity(), invalid.config().algorithm().startIntensity());
+    }
+
+    @Test
+    void changedSerialBaudRateIsAvailableToRuntimeConfig() throws Exception {
+        var path = Files.createTempFile("serial-baud-config", ".json");
+        Files.writeString(path, """
+                {
+                  "serial": { "baudRate": 19200 }
+                }
+                """);
+
+        var result = new JsonAudiometryConfigLoader().load(path);
+
+        assertTrue(result.loadedFromFile());
+        assertEquals(19200, result.config().serialProtocol().baudRate());
     }
 }
