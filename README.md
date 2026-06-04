@@ -59,6 +59,10 @@ The current visible procedure is **Procedure: Automatic Hughson-Westlake**. A se
 
 The current visible procedure is **Procedure: Automatic Hughson-Westlake**. A separate Manual Mode is not exposed because it is not fully implemented. **Present tone** and **Mark RESPONSE** are manual control buttons within the automatic Hughson-Westlake workflow, not a separate Manual Mode. Manual Mode can be considered future work.
 
+## Procedure and Manual Controls
+
+The current visible procedure is **Procedure: Automatic Hughson-Westlake**. A separate Manual Mode is not exposed because it is not fully implemented. **Present tone** and **Mark RESPONSE** are manual control buttons within the automatic Hughson-Westlake workflow, not a separate Manual Mode. Manual Mode can be considered future work.
+
 ## Pause / Resume / Stop
 
 * **Pause test** sets the session to `PAUSED` and blocks further tone presentation or auto-simulation.
