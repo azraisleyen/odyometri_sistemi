@@ -1,6 +1,6 @@
 # Functional Programming Design
 
-The audiometry core is deterministic and side-effect-free. Medical/audiometric calculations are implemented as pure functions for validation, intensity transitions, index-based clinical-order cursor progression with duplicate-free final audiogram rows, next ear selection, tone creation, recent-window threshold detection, audiogram point creation, and hearing classification.
+The audiometry core is deterministic and side-effect-free. Medical/audiometric calculations are implemented as pure functions for validation, intensity transitions, duplicate-free educational frequency cursor progression, next ear selection, tone creation, recent-window threshold detection, audiogram point creation, and hearing classification.
 
 Immutable Java records represent state. `TestState` stores current ear, current frequency index, current frequency, dB HL, phase, direction, presentation history, event history, audiogram points, and errors. Update methods return new state values rather than mutating lists in place.
 

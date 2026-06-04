@@ -125,6 +125,48 @@ class AudiometryWorkflowTest {
         assertEquals("\n", AudiometryConfig.defaults().serialProtocol().commandTerminator());
     }
 
+
+    @Test
+    void activeThresholdOrderIsDuplicateFreeEducationalRuntimeOrder() {
+        var order = AudiometryConfig.defaults().frequencyPlan().activeThresholdOrder().stream()
+                .map(frequency -> frequency.value())
+                .toList();
+
+        assertEquals(List.of(1000, 2000, 4000, 8000, 500, 250), order);
+        assertEquals(order.size(), Set.copyOf(order).size());
+    }
+
+    @Test
+    void configuredSerialTerminatorIsUsedWithoutChangingLoggedCommandBody() {
+        var gateway = new FakeSerialGateway();
+        var defaults = AudiometryConfig.defaults();
+        var config = new AudiometryConfig(
+                defaults.minFrequency(),
+                defaults.maxFrequency(),
+                defaults.minIntensity(),
+                defaults.maxIntensity(),
+                defaults.frequencyPlan(),
+                defaults.algorithm(),
+                new SerialProtocolConfig(9600, true, "\r\n"),
+                defaults.ears(),
+                defaults.manualFrequencyOverride(),
+                defaults.allowRetest()
+        );
+        var useCase = new AudiometryUseCase(config, gateway);
+
+        var result = useCase.sessions().presentTone();
+
+        assertTrue(result.isOk());
+        assertEquals("TONE;EAR=RIGHT;FREQ=1000;DB=40;DURATION_MS=1000", result.orElse(""));
+        assertEquals("TONE;EAR=RIGHT;FREQ=1000;DB=40;DURATION_MS=1000", gateway.sentCommands().getFirst());
+        assertEquals("TONE;EAR=RIGHT;FREQ=1000;DB=40;DURATION_MS=1000\r\n", gateway.sentPayloads().getFirst());
+    }
+
+    @Test
+    void defaultSerialTerminatorIsLineFeed() {
+        assertEquals("\n", AudiometryConfig.defaults().serialProtocol().commandTerminator());
+    }
+
     @Test
     void pauseResumeAndStopRequireReset() {
         var useCase = useCase(new FakeSerialGateway());
