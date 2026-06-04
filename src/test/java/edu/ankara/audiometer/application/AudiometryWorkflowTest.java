@@ -4,6 +4,7 @@ import edu.ankara.audiometer.domain.config.AudiometryConfig;
 import edu.ankara.audiometer.domain.config.SerialProtocolConfig;
 import edu.ankara.audiometer.domain.model.Ear;
 import edu.ankara.audiometer.domain.model.EarTestMode;
+import edu.ankara.audiometer.domain.model.ProtocolEvent;
 import edu.ankara.audiometer.domain.model.TestPhase;
 import edu.ankara.audiometer.infrastructure.serial.FakeSerialGateway;
 import org.junit.jupiter.api.Test;
@@ -68,33 +69,29 @@ class AudiometryWorkflowTest {
     }
 
     @Test
-    void duplicate1000ClinicalRetestDoesNotCreateLoopOrDuplicateThresholdRows() {
+    void duplicate1000ClinicalRetestIsVisitedButDoesNotCreateDuplicateThresholdRows() {
         var useCase = useCase(new FakeSerialGateway());
         runToCompletion(useCase);
 
-        var right1000 = useCase.sessions().state().audiogram().points().stream()
-                .filter(point -> point.ear() == Ear.RIGHT)
-                .filter(point -> point.frequency().value() == 1000)
-                .count();
-        var left1000 = useCase.sessions().state().audiogram().points().stream()
-                .filter(point -> point.ear() == Ear.LEFT)
-                .filter(point -> point.frequency().value() == 1000)
-                .count();
-
-        assertEquals(1, right1000);
-        assertEquals(1, left1000);
-        assertEquals(12, useCase.sessions().state().audiogram().points().size());
+        var state = useCase.sessions().state();
+        assertEquals(2, presentationVisits(state, Ear.RIGHT, 1000));
+        assertEquals(2, presentationVisits(state, Ear.LEFT, 1000));
+        assertEquals(1, thresholdRows(state, Ear.RIGHT, 1000));
+        assertEquals(1, thresholdRows(state, Ear.LEFT, 1000));
+        assertEquals(12, state.audiogram().points().size());
+        assertTrue(state.eventHistory().stream().anyMatch(event -> event instanceof ProtocolEvent.RetestValidation));
     }
 
-
     @Test
-    void activeThresholdOrderIsDuplicateFreeEducationalRuntimeOrder() {
-        var order = AudiometryConfig.defaults().frequencyPlan().activeThresholdOrder().stream()
-                .map(frequency -> frequency.value())
-                .toList();
+    void clinicalRuntimeOrderIncludesTrue1000HzRetestAndUniqueThresholdOrderDoesNot() {
+        var plan = AudiometryConfig.defaults().frequencyPlan();
+        var runtimeOrder = plan.activeOrder().stream().map(frequency -> frequency.value()).toList();
+        var uniqueOrder = plan.uniqueThresholdFrequencies().stream().map(frequency -> frequency.value()).toList();
 
-        assertEquals(List.of(1000, 2000, 4000, 8000, 500, 250), order);
-        assertEquals(order.size(), Set.copyOf(order).size());
+        assertEquals(List.of(1000, 2000, 4000, 8000, 1000, 500, 250), runtimeOrder);
+        assertEquals(List.of(1000, 2000, 4000, 8000, 500, 250), uniqueOrder);
+        assertEquals(uniqueOrder.size(), Set.copyOf(uniqueOrder).size());
+        assertTrue(plan.isRetestOccurrence(4));
     }
 
     @Test
@@ -145,6 +142,38 @@ class AudiometryWorkflowTest {
     }
 
     @Test
+    void rightOnlySimulationVisits1000RetestAndCompletesWithUniqueFinalRows() {
+        var useCase = useCase(new FakeSerialGateway());
+        useCase.sessions().setEarMode(EarTestMode.RIGHT_ONLY);
+        runToCompletion(useCase);
+
+        var state = useCase.sessions().state();
+        assertEquals(TestPhase.COMPLETED, state.phase());
+        assertEquals(2, presentationVisits(state, Ear.RIGHT, 1000));
+        assertEquals(1, thresholdRows(state, Ear.RIGHT, 1000));
+        assertFrequenciesReached(state.audiogram().points().stream()
+                .filter(point -> point.ear() == Ear.RIGHT)
+                .map(point -> point.frequency().value())
+                .collect(Collectors.toSet()));
+    }
+
+    @Test
+    void leftOnlySimulationVisits1000RetestAndCompletesWithUniqueFinalRows() {
+        var useCase = useCase(new FakeSerialGateway());
+        useCase.sessions().setEarMode(EarTestMode.LEFT_ONLY);
+        runToCompletion(useCase);
+
+        var state = useCase.sessions().state();
+        assertEquals(TestPhase.COMPLETED, state.phase());
+        assertEquals(2, presentationVisits(state, Ear.LEFT, 1000));
+        assertEquals(1, thresholdRows(state, Ear.LEFT, 1000));
+        assertFrequenciesReached(state.audiogram().points().stream()
+                .filter(point -> point.ear() == Ear.LEFT)
+                .map(point -> point.frequency().value())
+                .collect(Collectors.toSet()));
+    }
+
+    @Test
     void simulationThresholdDefaultsAreEarSpecific() {
         var simulation = new SimulationService();
         var config = AudiometryConfig.defaults();
@@ -163,6 +192,22 @@ class AudiometryWorkflowTest {
             steps++;
         }
         assertTrue(steps < 300, "workflow should complete without an infinite loop");
+    }
+
+    private static long presentationVisits(edu.ankara.audiometer.domain.model.TestState state, Ear ear, int frequency) {
+        return state.presentations().stream()
+                .filter(presentation -> presentation.ear() == ear)
+                .filter(presentation -> presentation.frequency().value() == frequency)
+                .map(presentation -> presentation.frequencyOrderIndex())
+                .distinct()
+                .count();
+    }
+
+    private static long thresholdRows(edu.ankara.audiometer.domain.model.TestState state, Ear ear, int frequency) {
+        return state.audiogram().points().stream()
+                .filter(point -> point.ear() == ear)
+                .filter(point -> point.frequency().value() == frequency)
+                .count();
     }
 
     private static void assertFrequenciesReached(Set<Integer> frequencies) {

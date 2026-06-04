@@ -36,3 +36,17 @@ RESPONSE
 ```
 
 The parser trims whitespace, removes CR/LF, supports case-insensitive input, safely ignores invalid messages, and supports future messages: `READY`, `ACK`, `BUTTON_DOWN`, `BUTTON_UP`, and `ERROR:<message>`.
+
+
+## Proteus / COMPIM Verification Checklist
+
+This repository does not include Proteus hardware evidence and does not claim that a Proteus test has already passed. For the final report, verify and record the following manually:
+
+1. Java sends `TONE;EAR=RIGHT;FREQ=1000;DB=40;DURATION_MS=1000`.
+2. Proteus/Arduino/COMPIM receives the command and generates the requested tone in the virtual hardware.
+3. The virtual patient button sends `RESPONSE`.
+4. The Java Event Log shows `Incoming serial: RESPONSE`.
+5. Hughson-Westlake threshold detection proceeds to the next intensity/frequency.
+6. Record a screenshot, short video, and Event Log excerpt as report evidence.
+
+The serial protocol is intentionally device-agnostic: Proteus, ESP32-S3, or FPGA button hardware can be used as long as the Java side receives `RESPONSE` over the configured serial link.
