@@ -23,7 +23,7 @@ public final class AudiometerApp extends Application {
         if (css != null) {
             scene.getStylesheets().add(css.toExternalForm());
         }
-        stage.setTitle("Odyometre Sistemi Tasarımı ve Testi");
+        stage.setTitle("Audiometer System Design and Testing");
         stage.setMinWidth(1100);
         stage.setMinHeight(720);
         stage.setScene(scene);

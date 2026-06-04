@@ -28,7 +28,7 @@ public final class HughsonWestlakeEngine {
         var decision = ThresholdDetector.detectThreshold(withResponse.presentations(), withResponse.config().algorithm());
         if (decision.reached()) {
             var point = AudiometryFunctions.createAudiogramPoint(withResponse, decision.threshold().orElseThrow());
-            var withPoint = withResponse.withAudiogram(withResponse.audiogram().add(point, withResponse.config().allowRetest()));
+            var withPoint = withResponse.withAudiogram(withResponse.audiogram().add(point, false));
             return advanceFrequencyOrEar(withPoint);
         }
 

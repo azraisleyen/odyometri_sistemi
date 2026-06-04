@@ -10,9 +10,14 @@ public final class FakeSerialGateway implements SerialPortGateway {
     private SerialConnectionStatus status = new SerialConnectionStatus(true, "SIMULATED-COM", "Simulation mode connected");
     private Consumer<String> onLine = line -> { };
     private final List<String> sent = new CopyOnWriteArrayList<>();
+    private final List<String> sentPayloads = new CopyOnWriteArrayList<>();
 
     public List<String> sentCommands() {
         return List.copyOf(sent);
+    }
+
+    public List<String> sentPayloads() {
+        return List.copyOf(sentPayloads);
     }
 
     @Override
@@ -34,8 +39,9 @@ public final class FakeSerialGateway implements SerialPortGateway {
     }
 
     @Override
-    public Result<Void, String> send(String command) {
+    public Result<Void, String> send(String command, String terminator) {
         sent.add(command);
+        sentPayloads.add(command + terminator);
         return Result.ok(null);
     }
 
