@@ -27,3 +27,8 @@ The serial protocol decouples Java software from Proteus, ESP32-S3, or FPGA butt
 
 ## Proteus/COMPIM Verification
 The Java software sends commands such as `TONE;EAR=RIGHT;FREQ=1000;DB=40;DURATION_MS=1000`. For system-integration evidence, the team should verify that Proteus/Arduino/COMPIM receives the command, that the virtual patient button sends `RESPONSE`, that the Java Event Log displays the incoming response, and that threshold detection proceeds. Evidence should be recorded as screenshots, a short video, and Event Log excerpts. This is a checklist, not a claim that hardware validation has already passed.
+
+## Optional Proteus/COMPIM Integration Evidence Paragraph
+Use the following paragraph only after the actual Proteus/COMPIM system-level test has been performed and screenshots, videos, or Event Log excerpts have been inserted into the report:
+
+The Java audiometry software was connected to the Proteus-based virtual hardware through the COMPIM Virtual COM Port interface. During the integration test, the Java Event Log showed outgoing tone commands, Proteus/COMPIM received the serial command, and the Proteus-side virtual patient button returned `RESPONSE` to Java. After the returned response was parsed, the Hughson-Westlake workflow advanced, threshold detection continued, the Results table was updated, and the real-time audiogram displayed the measured threshold point. The supporting report evidence should include the Java Serial Connection panel, Proteus COMPIM configuration, outgoing command log, incoming `RESPONSE` log, threshold-detected log, audiogram update, and CSV/JSON export evidence.
