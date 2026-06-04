@@ -69,7 +69,8 @@ public final class AudiometryFunctions {
                 state.nextOrder(),
                 Optional.empty(),
                 state.direction(),
-                ascending
+                ascending,
+                state.currentFrequencyIndex()
         );
     }
 

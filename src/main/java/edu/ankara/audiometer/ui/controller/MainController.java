@@ -16,6 +16,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
@@ -37,7 +38,13 @@ public final class MainController {
     private final ResultPanel results = new ResultPanel();
     private final Label mode = new Label();
     private final Label stateLabel = new Label();
+    private final Label completionBadge = new Label();
+    private final Label exportStatus = new Label("No completed thresholds yet.");
+    private final Button exportCsvButton = new Button("Export CSV");
+    private final Button exportJsonButton = new Button("Export JSON");
     private int lastThresholdCount = 0;
+    private int lastEventCount = 0;
+    private boolean completionLogged = false;
 
     public MainController(AudiometryUseCase useCase, boolean simulationMode, String configWarning) {
         this.useCase = useCase;
@@ -79,9 +86,16 @@ public final class MainController {
         left.setPadding(new Insets(12));
         left.setPrefWidth(380);
 
+        ScrollPane leftScroll = new ScrollPane(left);
+        leftScroll.setFitToWidth(true);
+        leftScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        leftScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        leftScroll.getStyleClass().add("left-scroll");
+        leftScroll.setPrefWidth(400);
+
         SplitPane center = new SplitPane(chart, new VBox(10, results, log));
-        center.setDividerPositions(.62);
-        root.setLeft(left);
+        center.setDividerPositions(.60);
+        root.setLeft(leftScroll);
         root.setCenter(center);
         refresh(useCase.sessions().state());
         if (!configWarning.isBlank()) {
@@ -105,17 +119,18 @@ public final class MainController {
 
     private Parent currentState() {
         stateLabel.getStyleClass().add("state");
-        TitledPane pane = new TitledPane("Current Test State", new VBox(stateLabel));
+        completionBadge.getStyleClass().add("completion-badge");
+        completionBadge.setVisible(false);
+        TitledPane pane = new TitledPane("Current Test State", new VBox(8, completionBadge, stateLabel));
         pane.setCollapsible(false);
         return pane;
     }
 
     private Parent exportPanel() {
-        Button csv = new Button("Export CSV");
-        csv.setOnAction(event -> exportCsv());
-        Button json = new Button("Export JSON");
-        json.setOnAction(event -> exportJson());
-        TitledPane pane = new TitledPane("Export Controls", new FlowPane(8, 8, csv, json));
+        exportCsvButton.setOnAction(event -> exportCsv());
+        exportJsonButton.setOnAction(event -> exportJson());
+        exportStatus.getStyleClass().add("export-status");
+        TitledPane pane = new TitledPane("Export Controls", new VBox(8, new FlowPane(8, 8, exportCsvButton, exportJsonButton), exportStatus));
         pane.setCollapsible(false);
         return pane;
     }
@@ -155,6 +170,10 @@ public final class MainController {
     }
 
     private void autoSimulate() {
+        if (useCase.sessions().state().phase() == TestPhase.COMPLETED) {
+            log.add("Session already completed. Export results or reset the test.");
+            return;
+        }
         var result = useCase.sessions().autoSimulateStep(useCase.simulation());
         if (result.isOk()) {
             var step = result.orElse(null);
@@ -168,6 +187,8 @@ public final class MainController {
     private void reset() {
         useCase.sessions().reset();
         lastThresholdCount = 0;
+        lastEventCount = 0;
+        completionLogged = false;
         log.clear();
         log.add("Session reset");
     }
@@ -175,12 +196,16 @@ public final class MainController {
     private void criterionChanged(ThresholdCriterion criterion) {
         useCase.sessions().setCriterion(criterion);
         lastThresholdCount = 0;
+        lastEventCount = 0;
+        completionLogged = false;
         log.add("Criterion changed to " + criterion);
     }
 
     private void earModeChanged(EarTestMode mode) {
         useCase.sessions().setEarMode(mode);
         lastThresholdCount = 0;
+        lastEventCount = 0;
+        completionLogged = false;
         log.clear();
         log.add("Ear mode changed to " + mode + "; session reset with ears " + useCase.sessions().state().config().ears());
     }
@@ -188,40 +213,86 @@ public final class MainController {
     private void exportCsv() {
         Path path = Path.of("exports", "audiogram-" + FILE_TIME.format(LocalDateTime.now()) + ".csv");
         var result = useCase.exports().exportCsv(useCase.sessions().state(), path);
-        log.add(result.isOk() ? "CSV export written: " + path : "CSV export failed");
+        log.add(result.isOk() ? "CSV exported: " + path : "CSV export failed");
     }
 
     private void exportJson() {
         Path path = Path.of("exports", "session-" + FILE_TIME.format(LocalDateTime.now()) + ".json");
         var result = useCase.exports().exportJson(useCase.sessions().state(), path);
-        log.add(result.isOk() ? "JSON export written: " + path : "JSON export failed");
+        log.add(result.isOk() ? "JSON exported: " + path : "JSON export failed");
     }
 
     private void refresh(TestState state) {
-        stateLabel.setText("Ear: %s%nFrequency: %d Hz%nIntensity: %d dB HL%nPhase: %s%nResponses/events: %d%nCompleted thresholds: %d%nNext action: %s".formatted(
+        int expectedTotal = expectedThresholdTotal(state);
+        boolean completed = state.phase() == TestPhase.COMPLETED;
+        completionBadge.setText(completed ? "COMPLETED" : "");
+        completionBadge.setVisible(completed);
+        completionBadge.setManaged(completed);
+
+        String completionText = completed
+                ? "Status: COMPLETED%nAll selected ears and frequencies have been tested.%nYou can export CSV/JSON results.%n"
+                : "Status: " + state.phase() + "%n";
+        stateLabel.setText((completionText + "Ear: %s%nFrequency: %d Hz%nIntensity: %d dB HL%nPhase: %s%nResponses/events: %d%nCompleted thresholds: %d / %d%nNext action: %s").formatted(
                 state.currentEar(),
                 state.currentFrequency().value(),
                 state.currentIntensity().value(),
                 state.phase(),
                 state.eventHistory().size(),
                 state.audiogram().points().size(),
+                expectedTotal,
                 recommendation(state)
         ));
         chart.update(state.audiogram());
-        results.update(state.audiogram());
+        results.update(state.audiogram(), expectedTotal);
+        updateExportControls(state);
+        logNewEvents(state);
         if (state.audiogram().points().size() > lastThresholdCount) {
             var point = state.audiogram().points().getLast();
             log.add("Threshold detected: " + point.ear() + " " + point.frequency().value() + " Hz = " + point.thresholdDbHL().value() + " dB HL");
             lastThresholdCount = state.audiogram().points().size();
         }
-        if (state.phase() == TestPhase.COMPLETED) {
+        if (completed && !completionLogged) {
             log.add("Session completed; export results for the report.");
+            completionLogged = true;
         }
+    }
+
+    private void updateExportControls(TestState state) {
+        boolean hasResults = !state.audiogram().points().isEmpty();
+        exportCsvButton.setDisable(!hasResults);
+        exportJsonButton.setDisable(!hasResults);
+        exportStatus.setText(!hasResults
+                ? "Complete at least one threshold before exporting."
+                : state.phase() == TestPhase.COMPLETED
+                ? "Results are ready for export."
+                : "Partial results can be exported.");
+    }
+
+    private void logNewEvents(TestState state) {
+        for (int i = lastEventCount; i < state.eventHistory().size(); i++) {
+            switch (state.eventHistory().get(i)) {
+                case edu.ankara.audiometer.domain.model.ProtocolEvent.RetestValidation event -> log.add(
+                        event.frequency().value() + " Hz retest validated for " + event.ear() + " at " + event.threshold().value() + " dB HL"
+                );
+                case edu.ankara.audiometer.domain.model.ProtocolEvent.RetestWarning event -> log.add(
+                        "Warning: " + event.frequency().value() + " Hz retest for " + event.ear()
+                                + " differed from original threshold (original " + event.originalThreshold().value()
+                                + " dB HL, retest " + event.retestThreshold().value() + " dB HL). Final audiogram remains duplicate-free."
+                );
+                default -> {
+                }
+            }
+        }
+        lastEventCount = state.eventHistory().size();
+    }
+
+    private static int expectedThresholdTotal(TestState state) {
+        return state.config().ears().size() * state.config().frequencyPlan().uniqueThresholdFrequencies().size();
     }
 
     private static String recommendation(TestState state) {
         return switch (state.phase()) {
-            case COMPLETED -> "Export results";
+            case COMPLETED -> "Export results or reset the test.";
             case PAUSED -> "Press Resume test to continue";
             case STOPPED -> "Reset required";
             default -> "Present tone / wait for RESPONSE";
