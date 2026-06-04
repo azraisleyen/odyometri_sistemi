@@ -63,6 +63,7 @@ public final class JsonSessionExporter {
         config.put("max_frequency_hz", state.config().maxFrequency().value());
         config.put("required_frequencies_hz", state.config().frequencyPlan().requiredFrequencies().stream().map(f -> f.value()).toList());
         config.put("clinical_order_hz", state.config().frequencyPlan().clinicalOrder().stream().map(f -> f.value()).toList());
+        config.put("runtime_order_hz", state.config().frequencyPlan().activeOrder().stream().map(f -> f.value()).toList());
         config.put("active_threshold_order_hz", state.config().frequencyPlan().activeThresholdOrder().stream().map(f -> f.value()).toList());
         config.put("min_db_hl", state.config().minIntensity().value());
         config.put("max_db_hl", state.config().maxIntensity().value());

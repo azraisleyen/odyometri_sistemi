@@ -3,6 +3,7 @@ package edu.ankara.audiometer.domain.algorithm;
 import edu.ankara.audiometer.domain.model.IntensityDbHL;
 import edu.ankara.audiometer.domain.model.PatientResponse;
 import edu.ankara.audiometer.domain.model.PresentationDirection;
+import edu.ankara.audiometer.domain.model.ProtocolEvent;
 import edu.ankara.audiometer.domain.model.TestPhase;
 import edu.ankara.audiometer.domain.model.TestState;
 import edu.ankara.audiometer.domain.model.TonePresentation;
@@ -28,7 +29,16 @@ public final class HughsonWestlakeEngine {
         var decision = ThresholdDetector.detectThreshold(withResponse.presentations(), withResponse.config().algorithm());
         if (decision.reached()) {
             var point = AudiometryFunctions.createAudiogramPoint(withResponse, decision.threshold().orElseThrow());
-            var withPoint = withResponse.withAudiogram(withResponse.audiogram().add(point, withResponse.config().allowRetest()));
+            var existing = withResponse.audiogram().find(point.ear(), point.frequency());
+            TestState withRetestEvent = withResponse;
+            if (withResponse.config().frequencyPlan().isRetestOccurrence(withResponse.currentFrequencyIndex())) {
+                withRetestEvent = existing
+                        .map(original -> original.thresholdDbHL().equals(point.thresholdDbHL())
+                                ? withResponse.withEvent(new ProtocolEvent.RetestValidation(point.ear(), point.frequency(), point.thresholdDbHL()))
+                                : withResponse.withEvent(new ProtocolEvent.RetestWarning(point.ear(), point.frequency(), original.thresholdDbHL(), point.thresholdDbHL())))
+                        .orElse(withResponse.withEvent(new ProtocolEvent.RetestValidation(point.ear(), point.frequency(), point.thresholdDbHL())));
+            }
+            var withPoint = withRetestEvent.withAudiogram(withRetestEvent.audiogram().add(point, false));
             return advanceFrequencyOrEar(withPoint);
         }
 

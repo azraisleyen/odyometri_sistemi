@@ -6,7 +6,7 @@ The project uses a clean **functional-core / imperative-shell** architecture.
 
 * `domain/model`: immutable Java records and enums for ears, ear test modes, frequencies, intensities, tone presentations, audiogram points, and complete `TestState`.
 * `domain/config`: biomedical parameters such as frequency range, intensity range, step sizes, timeout, serial settings, frequency plan, and threshold criterion.
-* `domain/algorithm`: pure Hughson-Westlake functions, duplicate-free educational frequency progression, recent-window threshold detection, and deterministic reducers.
+* `domain/algorithm`: pure Hughson-Westlake functions, index-based clinical-order progression with a true 1000 Hz retest, recent-window threshold detection, duplicate-free final audiogram rows, and deterministic reducers.
 * `application`: session orchestration, ear-mode changes, pause/resume/stop/reset, simulation stepping, serial-message processing, and export use cases.
 * `infrastructure`: real jSerialComm serial gateway, fake simulation gateway, Jackson-based runtime JSON config loading, CSV exporter, and Jackson-based parseable JSON export.
 * `ui`: real English JavaFX desktop GUI controllers and views with custom audiogram symbols/legend.
@@ -25,13 +25,13 @@ Changing ear mode reinitializes the session with the updated immutable configura
 
 ## Audiogram GUI
 
-The audiogram chart uses equally spaced standard frequencies (250, 500, 1000, 2000, 4000, 8000). RIGHT thresholds are red `O` markers connected by a red line, and LEFT thresholds are blue `X` markers connected by a blue line. Constant simulated thresholds can naturally produce flat horizontal lines.
+The audiogram chart uses equally spaced standard frequencies (250, 500, 1000, 2000, 4000, 8000). RIGHT thresholds are red `O` markers connected by a red line, and LEFT thresholds are blue `X` markers connected by a blue line. Constant simulated thresholds can naturally produce flat horizontal lines. The left panel is scrollable so Export Controls remain reachable on smaller screens, completed sessions show an emphasized `COMPLETED` badge, and the Results table/count show unique final thresholds such as 12 / 12 for Both mode.
 
 ## Runtime Configuration and Export
 
 `config/audiometry-config.json` is loaded at startup with Jackson `ObjectMapper`. Invalid or missing config falls back to `AudiometryConfig.defaults()` with a visible log warning instead of crashing the GUI.
 
-JSON session export also uses Jackson `ObjectMapper` with pretty printing. The export includes software version, mode, session id, configuration, thresholds, and presentation history.
+JSON session export also uses Jackson `ObjectMapper` with pretty printing. The export includes software version, mode, session id, configuration, thresholds, and presentation history, including the second 1000 Hz retest presentation. Export buttons become available after results exist and the Event Log records exported file paths.
 
 ## Educational Limits
 

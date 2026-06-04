@@ -26,7 +26,7 @@ The **Ear** ComboBox is connected to backend logic:
 
 * **Right** starts at RIGHT 1000 Hz and emits only RIGHT tone commands.
 * **Left** starts at LEFT 1000 Hz and emits only LEFT tone commands.
-* **Both** starts with RIGHT, completes 1000/2000/4000/8000/500/250 Hz, then switches to LEFT and completes the same frequencies.
+* **Both** starts with RIGHT, visits 1000/2000/4000/8000/1000 retest/500/250 Hz, then switches to LEFT and completes the same sequence.
 
 Changing ear mode resets the session with the selected ears.
 
@@ -35,7 +35,7 @@ Changing ear mode resets the session with the selected ears.
 * **Start test**: starts the workflow by presenting a tone.
 * **Present tone**: sends/records the current tone presentation inside the automatic procedure.
 * **Mark RESPONSE**: manually applies a heard response inside the automatic procedure.
-* **Auto simulate step**: uses the application simulation service to present a tone and apply RESPONSE/NO_RESPONSE from ear-specific thresholds.
+* **Auto simulate step**: uses the application simulation service to present a tone and apply RESPONSE/NO_RESPONSE from ear-specific thresholds. After completion, the app reports that the session is already complete and tells the user to export or reset.
 * **Pause test**: changes phase to `PAUSED` and blocks progression.
 * **Resume test**: continues the same paused session.
 * **Stop test**: changes phase to `STOPPED`; reset before continuing.
@@ -45,8 +45,10 @@ Changing ear mode resets the session with the selected ears.
 
 The audiogram updates in real time with connected threshold points. RIGHT is a red `O` marker connected by a red line, and LEFT is a blue `X` marker connected by a blue line. Standard frequencies are displayed with equal audiometry-style spacing while the results table keeps actual Hz and dB HL values.
 
-Flat horizontal audiogram lines are expected when simulated thresholds are constant across frequencies; the software does not add artificial slopes or random visualization offsets.
+Flat horizontal audiogram lines are expected when simulated thresholds are constant across frequencies; the software does not add artificial slopes, random thresholds, or selectable demo profiles.
 
-Use **Export CSV** or **Export JSON** to write report evidence under `exports/`. JSON export is generated with Jackson and includes configuration, thresholds, and presentation history.
+The left panel is scrollable, so **Export Controls** remain reachable on smaller screens. Use **Export CSV** or **Export JSON** to write report evidence under `exports/`; buttons are enabled after at least one threshold exists, and completed sessions show `Results are ready for export`. JSON export is generated with Jackson and includes configuration, thresholds, and presentation history.
+
+When the session reaches `COMPLETED`, Current Test State shows a green completed badge, explains that all selected ears/frequencies have been tested, and displays `Completed thresholds: X / expectedTotal`. Both mode final Results contain 12 unique rows: RIGHT and LEFT each have 1000, 2000, 4000, 8000, 500, and 250 Hz. The 1000 Hz retest is stored in presentation/event history as validation but does not create a duplicate final threshold row.
 
 This GUI is for educational simulation only and must not be used for diagnosis or treatment. It does not claim clinical-device or IEC 60645-1 certification.

@@ -107,3 +107,19 @@
     -fx-font-weight: bold;
     -fx-text-fill: #334155;
 }
+.left-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+.completion-badge {
+    -fx-background-color: #16a34a;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 5 10;
+    -fx-background-radius: 12;
+}
+.export-status,
+.result-count {
+    -fx-text-fill: #334155;
+    -fx-font-weight: bold;
+}
