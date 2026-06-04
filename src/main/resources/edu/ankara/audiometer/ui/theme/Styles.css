@@ -48,23 +48,31 @@
 .chart-vertical-grid-lines {
     -fx-stroke: #d5dde8;
 }
-.right-ear-series.chart-series-line {
+.right-ear-series.chart-series-line,
+.default-color0.chart-series-line {
     -fx-stroke: #dc2626;
     -fx-stroke-width: 2.5px;
 }
-.left-ear-series.chart-series-line {
+.left-ear-series.chart-series-line,
+.default-color1.chart-series-line {
     -fx-stroke: #2563eb;
     -fx-stroke-width: 2.5px;
 }
-.audiogram-marker {
+.audiogram-marker,
+.default-color0.chart-line-symbol,
+.default-color1.chart-line-symbol {
     -fx-min-width: 22px;
     -fx-min-height: 22px;
     -fx-pref-width: 22px;
     -fx-pref-height: 22px;
     -fx-max-width: 22px;
     -fx-max-height: 22px;
-    -fx-background-color: rgba(255, 255, 255, 0.78);
-    -fx-background-radius: 11px;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
     -fx-alignment: center;
 }
 .right-ear-symbol,

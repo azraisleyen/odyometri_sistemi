@@ -16,30 +16,35 @@ import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 
 import java.util.Comparator;
-import java.util.List;
 
 public final class AudiogramChartPane extends TitledPane {
-    public static final String RIGHT_SERIES_NAME = "RIGHT red O";
-    public static final String LEFT_SERIES_NAME = "LEFT blue X";
-    private static final List<Integer> STANDARD_FREQUENCIES = List.of(250, 500, 1000, 2000, 4000, 8000);
+    private static final String LINE_STYLE_TEMPLATE = "-fx-stroke: %s; -fx-stroke-width: 2.5px;";
+    private static final String MARKER_STYLE = """
+            -fx-background-color: transparent;
+            -fx-background-insets: 0;
+            -fx-background-radius: 0;
+            -fx-border-color: transparent;
+            -fx-border-width: 0;
+            -fx-padding: 0;
+            """;
 
     private final LineChart<Number, Number> chart;
 
     public AudiogramChartPane() {
-        NumberAxis x = new NumberAxis(0, STANDARD_FREQUENCIES.size() - 1, 1);
+        NumberAxis x = new NumberAxis(0, AudiogramAxisMapping.standardFrequencies().size() - 1, 1);
         x.setLabel("Frequency (Hz)");
         x.setTickLabelFormatter(new StringConverter<>() {
             @Override
             public String toString(Number value) {
                 int position = value.intValue();
-                return position >= 0 && position < STANDARD_FREQUENCIES.size()
-                        ? String.valueOf(STANDARD_FREQUENCIES.get(position))
+                return position >= 0 && position < AudiogramAxisMapping.standardFrequencies().size()
+                        ? String.valueOf(AudiogramAxisMapping.standardFrequencies().get(position))
                         : "";
             }
 
             @Override
             public Number fromString(String string) {
-                return positionForFrequency(Integer.parseInt(string));
+                return AudiogramAxisMapping.positionForFrequency(Integer.parseInt(string));
             }
         });
 
@@ -71,19 +76,10 @@ public final class AudiogramChartPane extends TitledPane {
         setContent(content);
     }
 
-    public static List<Integer> standardFrequencies() {
-        return STANDARD_FREQUENCIES;
-    }
-
-    public static int positionForFrequency(int frequencyHz) {
-        int index = STANDARD_FREQUENCIES.indexOf(frequencyHz);
-        return index >= 0 ? index : frequencyHz;
-    }
-
     public void update(Audiogram audiogram) {
         chart.getData().clear();
-        addSeries(RIGHT_SERIES_NAME, Ear.RIGHT, audiogram);
-        addSeries(LEFT_SERIES_NAME, Ear.LEFT, audiogram);
+        addSeries(AudiogramNotation.RIGHT_SERIES_NAME, Ear.RIGHT, audiogram);
+        addSeries(AudiogramNotation.LEFT_SERIES_NAME, Ear.LEFT, audiogram);
     }
 
     private void addSeries(String name, Ear ear, Audiogram audiogram) {
@@ -91,9 +87,9 @@ public final class AudiogramChartPane extends TitledPane {
         series.setName(name);
         audiogram.points().stream()
                 .filter(point -> point.ear() == ear)
-                .sorted(Comparator.comparingInt(point -> positionForFrequency(point.frequency().value())))
+                .sorted(Comparator.comparingInt(point -> AudiogramAxisMapping.positionForFrequency(point.frequency().value())))
                 .forEach(point -> {
-                    int x = positionForFrequency(point.frequency().value());
+                    int x = AudiogramAxisMapping.positionForFrequency(point.frequency().value());
                     XYChart.Data<Number, Number> data = new XYChart.Data<>(x, -point.thresholdDbHL().value());
                     data.setNode(markerFor(ear));
                     series.getData().add(data);
@@ -105,15 +101,25 @@ public final class AudiogramChartPane extends TitledPane {
     private static StackPane markerFor(Ear ear) {
         Text symbol = new Text(ear.symbol());
         symbol.getStyleClass().add(ear == Ear.RIGHT ? "right-ear-symbol" : "left-ear-symbol");
+        symbol.setStyle("-fx-fill: %s; -fx-font-weight: bold; -fx-font-size: 18px;".formatted(AudiogramNotation.color(ear)));
+
         StackPane marker = new StackPane(symbol);
         marker.setAlignment(Pos.CENTER);
         marker.setMouseTransparent(true);
+        marker.setMinSize(22, 22);
+        marker.setPrefSize(22, 22);
+        marker.setMaxSize(22, 22);
+        marker.setStyle(MARKER_STYLE);
         marker.getStyleClass().addAll("audiogram-marker", ear == Ear.RIGHT ? "right-ear-marker" : "left-ear-marker");
         return marker;
     }
 
     private static Node customLegend() {
-        HBox legend = new HBox(18, legendItem(Ear.RIGHT, RIGHT_SERIES_NAME), legendItem(Ear.LEFT, LEFT_SERIES_NAME));
+        HBox legend = new HBox(
+                18,
+                legendItem(Ear.RIGHT, AudiogramNotation.RIGHT_SERIES_NAME),
+                legendItem(Ear.LEFT, AudiogramNotation.LEFT_SERIES_NAME)
+        );
         legend.setAlignment(Pos.CENTER);
         legend.getStyleClass().add("audiogram-legend");
         return legend;
@@ -131,13 +137,20 @@ public final class AudiogramChartPane extends TitledPane {
 
     private static void applySeriesStyle(XYChart.Series<Number, Number> series, Ear ear) {
         String styleClass = ear == Ear.RIGHT ? "right-ear-series" : "left-ear-series";
-        if (series.getNode() != null) {
-            series.getNode().getStyleClass().add(styleClass);
+        String inlineStyle = LINE_STYLE_TEMPLATE.formatted(AudiogramNotation.color(ear));
+        applyLineStyle(series.getNode(), styleClass, inlineStyle);
+        series.nodeProperty().addListener(
+                (observable, oldNode, newNode) -> applyLineStyle(newNode, styleClass, inlineStyle)
+        );
+    }
+
+    private static void applyLineStyle(Node node, String styleClass, String inlineStyle) {
+        if (node == null) {
+            return;
         }
-        series.nodeProperty().addListener((observable, oldNode, newNode) -> {
-            if (newNode != null) {
-                newNode.getStyleClass().add(styleClass);
-            }
-        });
+        if (!node.getStyleClass().contains(styleClass)) {
+            node.getStyleClass().add(styleClass);
+        }
+        node.setStyle(inlineStyle);
     }
 }
