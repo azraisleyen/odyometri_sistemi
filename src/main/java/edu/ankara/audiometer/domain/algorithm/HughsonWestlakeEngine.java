@@ -3,6 +3,7 @@ package edu.ankara.audiometer.domain.algorithm;
 import edu.ankara.audiometer.domain.model.IntensityDbHL;
 import edu.ankara.audiometer.domain.model.PatientResponse;
 import edu.ankara.audiometer.domain.model.PresentationDirection;
+import edu.ankara.audiometer.domain.model.ProtocolEvent;
 import edu.ankara.audiometer.domain.model.TestPhase;
 import edu.ankara.audiometer.domain.model.TestState;
 import edu.ankara.audiometer.domain.model.TonePresentation;

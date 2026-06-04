@@ -26,7 +26,7 @@ The **Ear** ComboBox is connected to backend logic:
 
 * **Right** starts at RIGHT 1000 Hz and emits only RIGHT tone commands.
 * **Left** starts at LEFT 1000 Hz and emits only LEFT tone commands.
-* **Both** starts with RIGHT, completes 1000/2000/4000/8000/500/250 Hz, then switches to LEFT and completes the same frequencies.
+* **Both** starts with RIGHT, visits 1000/2000/4000/8000/1000 retest/500/250 Hz, then switches to LEFT and completes the same sequence.
 
 Changing ear mode resets the session with the selected ears.
 
