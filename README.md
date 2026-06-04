@@ -32,7 +32,7 @@ The application loads `config/audiometry-config.json` at startup with Jackson `O
 The configured clinical order may include a 1000 Hz retest for documentation/future validation. The current educational runtime intentionally uses duplicate-free `activeThresholdOrder()` for final threshold progression:
 
 ```text
-1000, 2000, 4000, 8000, 500, 250
+1000, 2000, 4000, 8000, 1000 retest, 500, 250
 ```
 
 This prevents the old duplicate-1000 loop while ensuring 500 Hz and 250 Hz are reached. The software preserves the retest in configuration/documentation but does not claim certified clinical retest or IEC 60645-1 compliance.
@@ -49,7 +49,15 @@ Use simulation mode when Proteus or a COM port is not connected. The GUI languag
 3. Press **Reset test** after changing mode if needed; changing mode also resets the session.
 4. Press **Start test** or **Auto simulate step** repeatedly.
 
-Default simulation thresholds are RIGHT 25 dB HL and LEFT 30 dB HL. Completed sessions reach 1000, 2000, 4000, 8000, 500, and 250 Hz for each selected ear.
+Default simulation thresholds are RIGHT 25 dB HL and LEFT 30 dB HL. No demo profile, random threshold, or artificial audiogram slope is added, so flat horizontal simulated audiogram lines are expected. Completed sessions visit 1000, 2000, 4000, 8000, 1000 retest, 500, and 250 Hz for each selected ear; final results show the six unique threshold rows per ear.
+
+## Procedure and Manual Controls
+
+The current visible procedure is **Procedure: Automatic Hughson-Westlake**. A separate Manual Mode is not exposed because it is not fully implemented. **Present tone** and **Mark RESPONSE** are manual control buttons within the automatic Hughson-Westlake workflow, not a separate Manual Mode. Manual Mode can be considered future work.
+
+## Procedure and Manual Controls
+
+The current visible procedure is **Procedure: Automatic Hughson-Westlake**. A separate Manual Mode is not exposed because it is not fully implemented. **Present tone** and **Mark RESPONSE** are manual control buttons within the automatic Hughson-Westlake workflow, not a separate Manual Mode. Manual Mode can be considered future work.
 
 ## Procedure and Manual Controls
 
@@ -61,6 +69,8 @@ The current visible procedure is **Procedure: Automatic Hughson-Westlake**. A se
 * **Resume test** returns the same session to a presentable state.
 * **Stop test** sets `STOPPED`; reset is required before continuing.
 * **Reset test** clears state and starts again with the currently selected ear mode/configuration.
+* After completion, **Current Test State** prominently shows `COMPLETED`, displays `Completed thresholds: X / expectedTotal`, and tells the user to export CSV/JSON or reset the test.
+* The left control column is scrollable, so Serial Connection, Test Control & Simulation, Current Test State, and Export Controls remain reachable on smaller screens.
 
 ## Serial / Proteus Mode
 
@@ -88,7 +98,7 @@ The parser trims whitespace, removes CR/LF, supports case-insensitive `RESPONSE`
 
 ## Export CSV / JSON
 
-Use **Export CSV** or **Export JSON** in the GUI. Files are written under `exports/` with timestamps. You can also run:
+Use **Export CSV** or **Export JSON** in the GUI. Export buttons are enabled after at least one threshold exists, the completed state displays `Results are ready for export`, and files are written under `exports/` with timestamps. The Event Log records clear `CSV exported: ...` and `JSON exported: ...` paths. You can also run:
 
 ```powershell
 gradle --no-daemon exportSample

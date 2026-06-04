@@ -13,7 +13,7 @@ The Java program sends deterministic command bodies such as `TONE;EAR=RIGHT;FREQ
 Automated tests run with real JUnit 5 and jqwik dependencies. They verify validation, parsing, immutable state, reducer determinism, recent-window threshold criteria, ear modes, RIGHT-to-LEFT transition, low-frequency reachability, completion, config loading/fallback with Jackson, JSON parseability with Jackson, pause/resume, exports, serial terminator handling, and transition invariants.
 
 ## 3.3 System-Level Test
-Simulation mode exercises the same application and domain logic used by serial mode. Right-only, left-only, and both-ear workflows can be demonstrated without Proteus hardware, using default simulated thresholds of RIGHT 25 dB HL and LEFT 30 dB HL.
+Simulation mode exercises the same application and domain logic used by serial mode. Right-only, left-only, and both-ear workflows can be demonstrated without Proteus hardware, using default simulated thresholds of RIGHT 25 dB HL and LEFT 30 dB HL. No demo profile, random threshold, or artificial audiogram slope is added.
 
 ## 3.4 Audiogram Results
 Thresholds are stored as audiogram points by ear and frequency. The GUI renders right-ear results as red `O` symbols connected by a red line and left-ear results as blue `X` symbols connected by a blue line with standard audiometry frequencies shown in equal visual spacing. Flat lines are expected when simulated thresholds are constant across frequencies.
@@ -23,3 +23,7 @@ This is an academic simulation aligned with audiometry logic and configurable fo
 
 ## 4.2 Multidisciplinary Collaboration
 The serial protocol decouples Java software from Proteus, ESP32-S3, or FPGA button implementations as long as `RESPONSE` is transmitted.
+
+
+## Proteus/COMPIM Verification
+The Java software sends commands such as `TONE;EAR=RIGHT;FREQ=1000;DB=40;DURATION_MS=1000`. For system-integration evidence, the team should verify that Proteus/Arduino/COMPIM receives the command, that the virtual patient button sends `RESPONSE`, that the Java Event Log displays the incoming response, and that threshold detection proceeds. Evidence should be recorded as screenshots, a short video, and Event Log excerpts. This is a checklist, not a claim that hardware validation has already passed.

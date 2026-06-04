@@ -14,6 +14,8 @@ import javafx.util.StringConverter;
 import java.util.function.Consumer;
 
 public final class ControlPanel extends TitledPane {
+    public static final String PROCEDURE_LABEL = "Procedure: Automatic Hughson-Westlake";
+
     public ControlPanel(
             Runnable start,
             Runnable pause,

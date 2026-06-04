@@ -21,6 +21,7 @@ public final class ThresholdDetector {
         var relevantAscendingTrials = presentations.stream()
                 .filter(presentation -> presentation.ear() == last.ear())
                 .filter(presentation -> presentation.frequency().equals(last.frequency()))
+                .filter(presentation -> sameFrequencyOccurrence(presentation, last))
                 .filter(TonePresentation::validAscendingTrial)
                 .filter(presentation -> presentation.response().isPresent())
                 .toList();
@@ -33,6 +34,12 @@ public final class ThresholdDetector {
                 .filter(ThresholdDecision::reached)
                 .findFirst()
                 .orElse(ThresholdDecision.notReached(config.criterion(), "Criterion not yet satisfied"));
+    }
+
+    private static boolean sameFrequencyOccurrence(TonePresentation presentation, TonePresentation last) {
+        return last.frequencyOrderIndex() < 0
+                || presentation.frequencyOrderIndex() < 0
+                || presentation.frequencyOrderIndex() == last.frequencyOrderIndex();
     }
 
     private static ThresholdDecision decisionForIntensity(
