@@ -61,21 +61,75 @@
     -fx-fill: #334155;
     -fx-opacity: 1.0;
 }
+/* Unified ComboBox styling: selected value and arrow read as one coherent input. */
 .combo-box,
 .combo-box-base {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 0;
     -fx-text-fill: #111827;
 }
-.combo-box .list-cell {
+.combo-box-base > .list-cell {
+    -fx-background-color: transparent;
     -fx-text-fill: #111827;
+    -fx-padding: 6 10 6 10;
+}
+.combo-box-base > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 6 6 0;
+    -fx-padding: 0 8 0 8;
+}
+.combo-box-base > .arrow-button > .arrow {
+    -fx-background-color: #334155;
+}
+.combo-box-base:hover {
+    -fx-border-color: #94a3b8;
     -fx-background-color: #ffffff;
 }
-.combo-box:disabled,
-.combo-box-base:disabled {
-    -fx-opacity: 0.85;
+.combo-box-base:focused {
+    -fx-border-color: #2563eb;
+    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.18), 6, 0, 0, 0);
 }
-.combo-box:disabled .list-cell,
-.combo-box-base:disabled .list-cell {
+.combo-box-base:disabled {
+    -fx-opacity: 0.75;
+    -fx-background-color: #e5e7eb;
+}
+.combo-box-base:disabled > .list-cell {
     -fx-text-fill: #334155;
+}
+.combo-box-popup .list-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+.combo-box-popup .list-cell {
+    -fx-text-fill: #111827;
+    -fx-background-color: #ffffff;
+    -fx-padding: 6 10 6 10;
+}
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #e8eef7;
+}
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #111827;
+}
+.serial-mode-indicator {
+    -fx-background-color: #eef6ff;
+    -fx-border-color: #bfdbfe;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 5 10;
+    -fx-text-fill: #075985;
+    -fx-font-weight: bold;
+}
+.serial-mode-help {
+    -fx-text-fill: #475569;
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
 }
 .button {
     -fx-background-radius: 7;

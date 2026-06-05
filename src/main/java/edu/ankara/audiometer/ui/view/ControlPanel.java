@@ -32,6 +32,8 @@ public final class ControlPanel extends TitledPane {
         setCollapsible(false);
 
         ComboBox<EarTestMode> ear = new ComboBox<>();
+        ear.setPrefWidth(170);
+        ear.setMinWidth(170);
         ear.getItems().addAll(EarTestMode.BOTH, EarTestMode.RIGHT_ONLY, EarTestMode.LEFT_ONLY);
         ear.setValue(EarTestMode.BOTH);
         ear.setOnAction(event -> earMode.accept(ear.getValue()));
@@ -43,7 +45,8 @@ public final class ControlPanel extends TitledPane {
         ComboBox<ThresholdCriterion> criteria = new ComboBox<>();
         criteria.getItems().addAll(ThresholdCriterion.values());
         criteria.setConverter(thresholdCriterionConverter());
-        criteria.setPrefWidth(205);
+        criteria.setPrefWidth(230);
+        criteria.setMinWidth(230);
         criteria.setValue(ThresholdCriterion.TWO_OUT_OF_THREE_ASCENDING);
         criteria.setOnAction(event -> criterion.accept(criteria.getValue()));
 

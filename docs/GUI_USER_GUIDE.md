@@ -16,6 +16,8 @@ gradle --no-daemon run
 
 Select a COM port, choose the configured baud rate, and press **Connect**. Proteus/Arduino must send `RESPONSE` when the patient button is pressed. The command body logged in the event log remains `TONE;EAR=...`; the configured command terminator is appended only to the bytes sent to the serial port.
 
+The mode indicator in the Serial Connection panel is read-only because the serial gateway is selected at launch: `runSimulation` uses `SIMULATED-COM` without hardware, while `run` uses real COM ports through jSerialComm.
+
 ## Current Procedure
 
 The current educational workflow is **Procedure: Automatic Hughson-Westlake**. A separate Manual Mode is not exposed in the GUI because it is not fully implemented. **Present tone** and **Mark RESPONSE** remain available as manual control buttons inside the automatic Hughson-Westlake workflow; they are not a separate test mode. Manual Mode can be considered future work.
