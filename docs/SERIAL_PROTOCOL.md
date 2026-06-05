@@ -35,6 +35,14 @@ Required Proteus/Arduino patient-button message:
 RESPONSE
 ```
 
+When a fake serial test device needs to explicitly report that the virtual patient did not hear the tone, it may send any of these equivalent messages:
+
+```text
+NO_RESPONSE
+NORESPONSE
+NOT_HEARD
+```
+
 The parser trims whitespace, removes CR/LF, supports case-insensitive input, safely ignores invalid messages, and supports future messages: `READY`, `ACK`, `BUTTON_DOWN`, `BUTTON_UP`, and `ERROR:<message>`.
 
 
