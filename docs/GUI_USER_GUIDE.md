@@ -37,7 +37,7 @@ Changing ear mode resets the session with the selected ears.
 * **Start test**: starts the workflow by presenting a tone.
 * **Present tone**: sends/records the current tone presentation inside the automatic procedure.
 * **Mark RESPONSE**: manually applies a heard response inside the automatic procedure.
-* **Auto simulate step**: uses the application simulation service to present a tone and apply RESPONSE/NO_RESPONSE from ear-specific thresholds. After completion, the app reports that the session is already complete and tells the user to export or reset.
+* **Auto simulate step**: uses the application simulation service to present a tone and apply RESPONSE/NO_RESPONSE from frequency-based educational demo thresholds. These values are not real patient data; they exist only for software demonstration and audiogram visualization. After completion, the app reports that the session is already complete and tells the user to export or reset.
 * **Pause test**: changes phase to `PAUSED` and blocks progression.
 * **Resume test**: continues the same paused session.
 * **Stop test**: changes phase to `STOPPED`; reset before continuing.
@@ -47,7 +47,7 @@ Changing ear mode resets the session with the selected ears.
 
 The audiogram updates in real time with connected threshold points. RIGHT is a red `O` marker connected by a red line, and LEFT is a blue `X` marker connected by a blue line. Standard frequencies are displayed with equal audiometry-style spacing while the results table keeps actual Hz and dB HL values.
 
-Flat horizontal audiogram lines are expected when simulated thresholds are constant across frequencies; the software does not add artificial slopes, random thresholds, or selectable demo profiles.
+Simulation mode uses a fixed frequency-based educational demo profile so RIGHT and LEFT audiogram lines can vary by frequency during presentations. These demo thresholds are not real patient data and must only be used for software demonstration and audiogram visualization; the software does not add random thresholds or selectable demo profiles.
 
 The left panel is scrollable, so **Export Controls** remain reachable on smaller screens. Use **Export CSV** or **Export JSON** to write report evidence under `exports/`; buttons are enabled after at least one threshold exists, and completed sessions show `Results are ready for export`. JSON export is generated with Jackson and includes configuration, thresholds, and presentation history.
 

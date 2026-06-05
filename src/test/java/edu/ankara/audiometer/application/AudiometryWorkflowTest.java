@@ -4,6 +4,7 @@ import edu.ankara.audiometer.domain.config.AudiometryConfig;
 import edu.ankara.audiometer.domain.config.SerialProtocolConfig;
 import edu.ankara.audiometer.domain.model.Ear;
 import edu.ankara.audiometer.domain.model.EarTestMode;
+import edu.ankara.audiometer.domain.model.FrequencyHz;
 import edu.ankara.audiometer.domain.model.ProtocolEvent;
 import edu.ankara.audiometer.domain.model.TestPhase;
 import edu.ankara.audiometer.infrastructure.serial.FakeSerialGateway;
@@ -174,11 +175,21 @@ class AudiometryWorkflowTest {
     }
 
     @Test
-    void simulationThresholdDefaultsAreEarSpecific() {
+    void simulationThresholdDefaultsAreFrequencySpecific() {
         var simulation = new SimulationService();
-        var config = AudiometryConfig.defaults();
-        assertEquals(25, simulation.thresholdFor(Ear.RIGHT, config.frequencyPlan().activeOrder().getFirst()).value());
-        assertEquals(30, simulation.thresholdFor(Ear.LEFT, config.frequencyPlan().activeOrder().getFirst()).value());
+
+        assertEquals(25, simulation.thresholdFor(Ear.RIGHT, new FrequencyHz(1000)).value());
+        assertEquals(35, simulation.thresholdFor(Ear.RIGHT, new FrequencyHz(4000)).value());
+        assertEquals(30, simulation.thresholdFor(Ear.LEFT, new FrequencyHz(1000)).value());
+        assertEquals(45, simulation.thresholdFor(Ear.LEFT, new FrequencyHz(8000)).value());
+    }
+
+    @Test
+    void simulationThresholdFallsBackSafelyForUnknownFrequency() {
+        var simulation = new SimulationService();
+
+        assertEquals(25, simulation.thresholdFor(Ear.RIGHT, new FrequencyHz(1500)).value());
+        assertEquals(30, simulation.thresholdFor(Ear.LEFT, new FrequencyHz(1500)).value());
     }
 
     private static AudiometryUseCase useCase(FakeSerialGateway gateway) {

@@ -87,7 +87,7 @@ public final class ControlPanel extends TitledPane {
                 responseButton,
                 autoButton
         );
-        setContent(new VBox(10, form, buttons, new Label("Simulation thresholds: RIGHT 25 dB HL, LEFT 30 dB HL.")));
+        setContent(new VBox(10, form, buttons, new Label("Simulation profile: frequency-based demo thresholds.")));
     }
 
     private static StringConverter<ThresholdCriterion> thresholdCriterionConverter() {
