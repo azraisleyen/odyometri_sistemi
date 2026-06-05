@@ -29,10 +29,12 @@ public final class SerialPanel extends TitledPane {
         baud.getItems().addAll(9600, 19200, 115200);
         baud.setValue(defaultBaudRate);
 
-        Label status = new Label("Disconnected");
-        Label modeIndicator = new Label("Mode: Hardware serial");
+        Label status = new Label(simulationMode ? "Simulation mode: no COM port required" : "Disconnected");
+        Label modeIndicator = new Label(simulationMode ? "Mode: Simulation (no hardware required)" : "Mode: Hardware serial");
         modeIndicator.getStyleClass().add("serial-mode-indicator");
-        Label modeHelp = new Label("Select a COM port and click Connect.");
+        Label modeHelp = new Label(simulationMode
+                ? "To use a real COM port, start with: gradle --no-daemon run"
+                : "Select a COM port and click Connect.");
         modeHelp.getStyleClass().add("serial-mode-help");
 
         Button refresh = new Button("Refresh");
