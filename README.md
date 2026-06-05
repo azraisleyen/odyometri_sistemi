@@ -1,4 +1,4 @@
-# Audiometer System Design and Testing
+﻿# Audiometer System Design and Testing
 
 **Audiometer System Design and Testing** is a Java 21 + JavaFX desktop application for an educational audiometry course project. It demonstrates a configurable Hughson-Westlake workflow, serial communication with Proteus/Arduino-style hardware, simulation mode without hardware, real-time audiogram rendering, CSV/JSON export, and automated tests.
 
@@ -10,17 +10,17 @@ Recommended environment:
 
 * Windows 11
 * Eclipse Temurin JDK 21 or another Java 21 JDK
-* Gradle 9.5.1 or a compatible installed Gradle version
+* Internet connection for the first Gradle Wrapper run
 * Proteus/Arduino virtual COM port only if you want serial mode
 
-## Build, Test, and Run with Gradle
+## Build, Test, and Run with Gradle Wrapper
 
 ```powershell
-gradle --no-daemon clean build
-gradle --no-daemon test
-gradle --no-daemon runSimulation
-gradle --no-daemon run
-gradle --no-daemon exportSample
+.\gradlew.bat clean build
+.\gradlew.bat test
+.\gradlew.bat runSimulation
+.\gradlew.bat run
+.\gradlew.bat exportSample
 ```
 
 `runSimulation` and `run` open a real English JavaFX window titled **Audiometer System Design and Testing**. The project intentionally contains no JavaFX, jSerialComm, JUnit, or jqwik stub packages.
@@ -41,7 +41,7 @@ The test flow uses index-based progression through the clinical order, so the du
 
 Use simulation mode when Proteus or a COM port is not connected. The GUI language is English.
 
-1. Run `gradle --no-daemon runSimulation`.
+1. Run `.\gradlew.bat runSimulation`.
 2. Select **Ear** mode:
    * **Right**: tests only RIGHT and emits only `EAR=RIGHT` commands.
    * **Left**: tests only LEFT and emits only `EAR=LEFT` commands.
@@ -69,7 +69,7 @@ The current visible procedure is **Procedure: Automatic Hughson-Westlake**. A se
 Run:
 
 ```powershell
-gradle --no-daemon run
+.\gradlew.bat run
 ```
 
 Select the COM port connected to Proteus COMPIM / Arduino, choose the configured baud rate, and press **Connect**. Serial settings are 8 data bits, 1 stop bit, no parity. The actual serial bytes append the configured command terminator (`\n` by default), while the GUI log keeps the command body clean.
@@ -93,7 +93,7 @@ The parser trims whitespace, removes CR/LF, supports case-insensitive `RESPONSE`
 Use **Export CSV** or **Export JSON** in the GUI. Export buttons are enabled after at least one threshold exists, the completed state displays `Results are ready for export`, and files are written under `exports/` with timestamps. The Event Log records clear `CSV exported: ...` and `JSON exported: ...` paths. You can also run:
 
 ```powershell
-gradle --no-daemon exportSample
+.\gradlew.bat exportSample
 ```
 
 CSV columns remain:
@@ -111,3 +111,4 @@ JSON export is generated with Jackson `ObjectMapper` instead of fragile manual s
 * Testing evidence: `docs/TESTING_REPORT.md` and tests under `src/test/java` using real JUnit 5, jqwik, and Jackson JSON assertions.
 * Communication protocol: `docs/SERIAL_PROTOCOL.md` and `infrastructure/serial`.
 * Audiogram/results evidence: GUI chart/table plus CSV/JSON exporters under `infrastructure/export`. RIGHT thresholds render as red `O` markers connected by a red line; LEFT thresholds render as blue `X` markers connected by a blue line. Both mode produces 12 unique final threshold rows: six for RIGHT and six for LEFT. Flat horizontal lines are expected when simulated thresholds are constant across frequencies.
+
