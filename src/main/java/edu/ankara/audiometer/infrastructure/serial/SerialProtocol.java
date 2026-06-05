@@ -29,6 +29,9 @@ public final class SerialProtocol {
         if (message.equals("RESPONSE")) {
             return Optional.of(new ProtocolEvent.Response());
         }
+        if (message.equals("NO_RESPONSE") || message.equals("NORESPONSE") || message.equals("NOT_HEARD")) {
+            return Optional.of(new ProtocolEvent.NoResponse());
+        }
         if (message.equals("READY")) {
             return Optional.of(new ProtocolEvent.Ready());
         }

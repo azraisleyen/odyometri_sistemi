@@ -33,6 +33,7 @@ public final class JSerialCommGateway implements SerialPortGateway {
             if (!port.openPort()) {
                 return Result.err("Cannot open " + portName);
             }
+            port.flushIOBuffers();
 
             running = true;
             executor = Executors.newSingleThreadExecutor(runnable -> new Thread(runnable, "serial-reader"));

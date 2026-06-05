@@ -32,6 +32,13 @@ class SerialProtocolTest {
     }
 
     @Test
+    void parsesNoResponseVariants() {
+        assertTrue(SerialProtocol.parseResponseMessage("NO_RESPONSE").orElseThrow() instanceof ProtocolEvent.NoResponse);
+        assertTrue(SerialProtocol.parseResponseMessage("noresponse").orElseThrow() instanceof ProtocolEvent.NoResponse);
+        assertTrue(SerialProtocol.parseResponseMessage("NOT_HEARD").orElseThrow() instanceof ProtocolEvent.NoResponse);
+    }
+
+    @Test
     void parsesFutureProtocolMessagesSafely() {
         assertTrue(SerialProtocol.parseResponseMessage("READY").orElseThrow() instanceof ProtocolEvent.Ready);
         assertTrue(SerialProtocol.parseResponseMessage("ACK").orElseThrow() instanceof ProtocolEvent.Ack);
