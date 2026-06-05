@@ -50,7 +50,7 @@ public final class MainController {
         this.useCase = useCase;
         this.simulationMode = simulationMode;
         this.configWarning = configWarning == null ? "" : configWarning;
-        this.mode.setText(simulationMode ? "Simulation Mode" : "Serial Mode");
+        this.mode.setText("Serial Mode");
         this.useCase.sessions().onState(state -> Platform.runLater(() -> refresh(state)));
     }
 
