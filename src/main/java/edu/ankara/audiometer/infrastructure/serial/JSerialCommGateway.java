@@ -3,9 +3,7 @@ package edu.ankara.audiometer.infrastructure.serial;
 import com.fazecast.jSerialComm.SerialPort;
 import edu.ankara.audiometer.domain.fp.Result;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -47,10 +45,30 @@ public final class JSerialCommGateway implements SerialPortGateway {
     }
 
     private void readLoop(Consumer<String> onLine) {
-        try (var reader = new BufferedReader(new InputStreamReader(port.getInputStream(), StandardCharsets.UTF_8))) {
-            String line;
-            while (running && (line = reader.readLine()) != null) {
-                onLine.accept(line);
+        StringBuilder buffer = new StringBuilder();
+
+        try (var input = port.getInputStream()) {
+            while (running) {
+                int value = input.read();
+
+                if (value < 0) {
+                    continue;
+                }
+
+                char ch = (char) value;
+
+                if (ch == '\n' || ch == '\r') {
+                    if (buffer.length() > 0) {
+                        String message = buffer.toString().trim();
+                        buffer.setLength(0);
+
+                        if (!message.isBlank()) {
+                            onLine.accept(message);
+                        }
+                    }
+                } else {
+                    buffer.append(ch);
+                }
             }
         } catch (IOException ignored) {
             if (running) {
